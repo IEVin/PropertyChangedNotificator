@@ -1,0 +1,4 @@
+NotifyAutoImplementer
+=====================
+
+Automatic implementation INotifyPropertyChanged
