@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
+﻿using NotifyAutoImplementer.Core;
 
 namespace NotifyAutoImplementer.TestCore
 {
-    public class TestModel : INotifyPropertyChanged
+    public class TestModel : NotifyPropertyObject
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public virtual string Name { get; set; }
 
         public virtual int Age { get; set; }

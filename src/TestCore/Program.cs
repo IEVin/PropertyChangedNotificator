@@ -22,6 +22,8 @@ namespace NotifyAutoImplementer.TestCore
 
             model.Age = 1;
             model.Name = "Test";
+            model.Name = "Test";
+            model.Name = "Test";
             model.Age++;
 
             Console.WriteLine("Age change count = {0} (must 2)", ageChangeCount);
