@@ -11,16 +11,28 @@ namespace NotifyAutoImplementer.Core
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
+        static readonly Dictionary<Guid, Type> s_cache = new Dictionary<Guid, Type>();
+
         public static T CreateInstanceProxy<T>()
             where T : NotifyPropertyObject, new()
         {
-            var type = CreateProxyType(typeof(T));
+            var guid = typeof(T).GUID;
+
+            //TODO: Add sync
+            Type type;
+            if(!s_cache.TryGetValue(guid, out type))
+            {
+                type = CreateProxyType(typeof(T));
+                s_cache[guid] = type;
+            }
+
+            //TODO: Add dynamic method
             return (T)Activator.CreateInstance(type);
         }
 
         static Type CreateProxyType(Type type)
         {
-            var tb = s_builder.Value.DefineType(type.Name + "_wrap", type.Attributes, type);
+            var tb = s_builder.Value.DefineType(type.Name + "_NotifyImplementation", type.Attributes, type);
 
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
@@ -39,7 +51,6 @@ namespace NotifyAutoImplementer.Core
                 tb.DefineMethodOverride(newSetter, setter);
                 prop.SetSetMethod(newSetter);
             }
-
 
             return tb.CreateType();
         }

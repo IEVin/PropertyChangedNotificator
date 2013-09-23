@@ -8,6 +8,7 @@ namespace NotifyAutoImplementer.TestCore
         public static void Main(string[] args)
         {
             var model = DynamicBuilder.CreateInstanceProxy<TestModel>();
+            DynamicBuilder.CreateInstanceProxy<TestModel>();
 
             var ageChangeCount = 0;
             var nameChangeCount = 0;
