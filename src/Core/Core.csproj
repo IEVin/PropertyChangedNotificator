@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Attributes.cs" />
     <Compile Include="DynamicBuilder.cs" />
+    <Compile Include="DynamicHelper.cs" />
     <Compile Include="NotifyPropertyObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
