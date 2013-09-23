@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes.cs" />
     <Compile Include="DynamicBuilder.cs" />
     <Compile Include="NotifyPropertyObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
