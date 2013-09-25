@@ -13,40 +13,59 @@ namespace NotifyAutoImplementer.Core
 
         static readonly Dictionary<Guid, Type> s_cache = new Dictionary<Guid, Type>();
 
-        public static T CreateInstanceProxy<T>()
+        public static T CreateInstance<T>()
             where T : NotifyPropertyObject, new()
         {
-            var guid = typeof(T).GUID;
+            var newType = GetOrCreateProxyType(typeof(T));
+            return (T)Activator.CreateInstance(newType);
+        }
+
+        public static object CreateInstance(Type type)
+        {
+            var newType = GetOrCreateProxyType(type);
+            return Activator.CreateInstance(newType);
+        }
+
+        static Type GetOrCreateProxyType(Type baseType)
+        {
+            var guid = baseType.GUID;
 
             //TODO: Add sync
             Type type;
             if(!s_cache.TryGetValue(guid, out type))
             {
-                type = CreateProxyType(typeof(T));
+                type = CreateProxyType(baseType);
                 s_cache[guid] = type;
             }
 
             //TODO: Add dynamic method
-            return (T)Activator.CreateInstance(type);
+            return type;
         }
 
         static Type CreateProxyType(Type type)
         {
-            var tb = s_builder.Value.DefineType(type.Name + "_NotifyImplementation", type.Attributes, type);
-
+            var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-            var properties = GetPropertyNames(type);
+            var allVirtual = Attribute.IsDefined(type, typeof(NotifyAllVirtualPropertyAttribute));
 
-            foreach(var q in properties)
+            foreach(var q in GetPropertyNames(type))
             {
+                var name = q.Name;
                 var gettet = q.GetGetMethod(true);
                 var setter = q.GetSetMethod(false);
                 if(setter == null || !setter.IsVirtual)
                     continue;
 
-                var prop = tb.DefineProperty(q.Name, q.Attributes, q.PropertyType, Type.EmptyTypes);
-                var newSetter = CreateSetMethod(tb, q.Name, gettet, setter);
+                var notifyNames = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true)
+                                   .Cast<NotifyPropertyAttribute>()
+                                   .Select(x => x.PropertyName ?? name);
+
+                if(allVirtual && !Attribute.IsDefined(q, typeof(SuppressNotifyAttribute)))
+                    notifyNames = notifyNames.Concat(new[] { name });
+
+                var prop = tb.DefineProperty(name, q.Attributes, q.PropertyType, Type.EmptyTypes);
+                var newSetter = CreateSetMethod(tb, gettet, setter, notifyNames.Distinct());
 
                 tb.DefineMethodOverride(newSetter, setter);
                 prop.SetSetMethod(newSetter);
@@ -55,7 +74,7 @@ namespace NotifyAutoImplementer.Core
             return tb.CreateType();
         }
 
-        static MethodBuilder CreateSetMethod(TypeBuilder tb, string name, MethodInfo getMi, MethodInfo setMi)
+        static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi, IEnumerable<string> names)
         {
             var paramTypes = setMi.GetParameters()
                                   .Select(x => x.ParameterType)
@@ -72,7 +91,7 @@ namespace NotifyAutoImplementer.Core
             // get current value
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, getMi);
-            
+
             // invoke equals
             il.Emit(OpCodes.Ldarg_1);
             il.Emit(OpCodes.Call, equals);
@@ -85,10 +104,13 @@ namespace NotifyAutoImplementer.Core
             il.Emit(OpCodes.Ldarg_1);
             il.Emit(OpCodes.Call, setMi);
 
-            // raise OnPropertyChanged event
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldstr, name);
-            il.Emit(OpCodes.Call, raise);
+            // raise OnPropertyChanged events
+            foreach(var q in names)
+            {
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldstr, q);
+                il.Emit(OpCodes.Call, raise);
+            }
 
             // exit
             il.MarkLabel(label);
@@ -107,7 +129,7 @@ namespace NotifyAutoImplementer.Core
 
         static ModuleBuilder CreateModule()
         {
-            var assemblyName = new AssemblyName(string.Format("DA_{0}", Guid.NewGuid().ToString()));
+            var assemblyName = new AssemblyName(string.Format("NAImplementerAssembly_{0}", Guid.NewGuid().ToString()));
 
             return AppDomain.CurrentDomain
                             .DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run)

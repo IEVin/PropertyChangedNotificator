@@ -2,7 +2,7 @@
 
 namespace NotifyAutoImplementer.TestCore
 {
-    [NotifyAllProperty(ThrowOnNoVirtual = true)]
+    [NotifyAllVirtualProperty]
     public class TestModel : NotifyPropertyObject
     {
         [NotifyProperty("Debug")]
@@ -12,6 +12,8 @@ namespace NotifyAutoImplementer.TestCore
         public virtual int Age { get; set; }
 
         [SuppressNotify]
+        public virtual bool IsEmpty { get; set; }
+
         public string Debug
         {
             get { return string.Format("Name={0}; Age={1};", Name, Age); }

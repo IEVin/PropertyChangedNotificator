@@ -23,9 +23,8 @@ namespace NotifyAutoImplementer.Core
     }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-    public class NotifyAllProperty : Attribute
+    public class NotifyAllVirtualPropertyAttribute : Attribute
     {
-        public bool ThrowOnNoVirtual { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
