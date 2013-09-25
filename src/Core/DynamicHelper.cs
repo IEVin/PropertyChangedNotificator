@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace NotifyAutoImplementer.Core
+namespace IEVin.NotifyAutoImplementer.Core
 {
     public static class DynamicHelper
     {

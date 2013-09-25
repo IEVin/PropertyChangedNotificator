@@ -1,6 +1,6 @@
-﻿using NotifyAutoImplementer.Core;
+﻿using IEVin.NotifyAutoImplementer.Core;
 
-namespace NotifyAutoImplementer.TestCore
+namespace IEVin.NotifyAutoImplementer.TestCore
 {
     [NotifyAllVirtualProperty]
     public class TestModel : NotifyPropertyObject

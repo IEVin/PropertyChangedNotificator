@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NotifyAutoImplementer.Core
+namespace IEVin.NotifyAutoImplementer.Core
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
     public class NotifyPropertyAttribute : Attribute

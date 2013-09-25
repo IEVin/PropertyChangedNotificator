@@ -1,7 +1,7 @@
 ﻿using System;
-using NotifyAutoImplementer.Core;
+using IEVin.NotifyAutoImplementer.Core;
 
-namespace NotifyAutoImplementer.TestCore
+namespace IEVin.NotifyAutoImplementer.TestCore
 {
     class Program
     {

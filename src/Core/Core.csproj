@@ -8,7 +8,7 @@
     <ProjectGuid>{43270923-D0F0-4664-B34D-092D2DDF2953}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NotifyAutoImplementer.Core</RootNamespace>
+    <RootNamespace>IEVin.NotifyAutoImplementer.Core</RootNamespace>
     <AssemblyName>NotifyAutoImplementer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

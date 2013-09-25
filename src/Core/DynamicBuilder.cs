@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Linq;
 using System.Reflection.Emit;
 
-namespace NotifyAutoImplementer.Core
+namespace IEVin.NotifyAutoImplementer.Core
 {
     public static class DynamicBuilder
     {

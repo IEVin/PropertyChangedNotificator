@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace NotifyAutoImplementer.Core
+namespace IEVin.NotifyAutoImplementer.Core
 {
     public class NotifyPropertyObject : INotifyPropertyChanged
     {
