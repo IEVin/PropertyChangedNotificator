@@ -3,7 +3,7 @@
 namespace IEVin.NotifyAutoImplementer.TestCore
 {
     [NotifyAllVirtualProperty]
-    public class TestModel : NotifyPropertyObject
+    public class TestModel : NotificationObject
     {
         [NotifyProperty("Debug")]
         public virtual string Name { get; set; }

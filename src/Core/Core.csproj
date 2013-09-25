@@ -41,9 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
-    <Compile Include="DynamicBuilder.cs" />
-    <Compile Include="DynamicHelper.cs" />
-    <Compile Include="NotifyPropertyObject.cs" />
+    <Compile Include="NotifyImplementer.cs" />
+    <Compile Include="Helper\NotifyAutoImplementerEqualsHelper.cs" />
+    <Compile Include="NotificationObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

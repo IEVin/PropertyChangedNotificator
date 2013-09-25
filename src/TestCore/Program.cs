@@ -7,8 +7,8 @@ namespace IEVin.NotifyAutoImplementer.TestCore
     {
         public static void Main(string[] args)
         {
-            var model = DynamicBuilder.CreateInstance<TestModel>();
-            DynamicBuilder.CreateInstance(typeof(TestModel));
+            var model = NotifyImplementer.CreateInstance<TestModel>();
+            NotifyImplementer.CreateInstance(typeof(TestModel));
 
             var ageChangeCount = 0;
             var nameChangeCount = 0;

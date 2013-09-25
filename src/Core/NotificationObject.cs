@@ -2,7 +2,7 @@
 
 namespace IEVin.NotifyAutoImplementer.Core
 {
-    public class NotifyPropertyObject : INotifyPropertyChanged
+    public abstract class NotificationObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

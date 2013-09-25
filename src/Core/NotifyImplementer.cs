@@ -4,17 +4,18 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Linq;
 using System.Reflection.Emit;
+using IEVin.NotifyAutoImplementer.Core.Helper;
 
 namespace IEVin.NotifyAutoImplementer.Core
 {
-    public static class DynamicBuilder
+    public static class NotifyImplementer
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
         static readonly Dictionary<Guid, Type> s_cache = new Dictionary<Guid, Type>();
 
         public static T CreateInstance<T>()
-            where T : NotifyPropertyObject, new()
+            where T : NotificationObject, new()
         {
             var newType = GetOrCreateProxyType(typeof(T));
             return (T)Activator.CreateInstance(newType);
@@ -82,8 +83,8 @@ namespace IEVin.NotifyAutoImplementer.Core
 
             var mb = tb.DefineMethod(setMi.Name, setMi.Attributes, null, paramTypes);
 
-            var equals = DynamicHelper.GetEquals(getMi.ReturnType);
-            var raise = DynamicHelper.GetRaise();
+            var equals = NotifyAutoImplementerEqualsHelper.GetEquals(getMi.ReturnType);
+            var raise = NotifyAutoImplementerEqualsHelper.GetRaise();
 
             var il = mb.GetILGenerator();
             var label = il.DefineLabel();

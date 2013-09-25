@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reflection;
 
-namespace IEVin.NotifyAutoImplementer.Core
+namespace IEVin.NotifyAutoImplementer.Core.Helper
 {
-    public static class DynamicHelper
+    public static class NotifyAutoImplementerEqualsHelper
     {
         internal static MethodInfo GetRaise()
         {
-            return typeof(NotifyPropertyObject)
+            return typeof(NotificationObject)
                 .GetMethod("RaisePropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic);
         }
 
@@ -15,7 +15,7 @@ namespace IEVin.NotifyAutoImplementer.Core
         {
             var method = type.IsClass ? "EqualsRef" : "EqualsVal";
 
-            return typeof(DynamicHelper)
+            return typeof(NotifyAutoImplementerEqualsHelper)
                 .GetMethod(method, BindingFlags.Static | BindingFlags.Public)
                 .MakeGenericMethod(type);
         }
