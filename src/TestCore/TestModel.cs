@@ -9,7 +9,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         public virtual string Name { get; set; }
 
         [NotifyProperty("Debug")]
-        public virtual int Age { get; set; }
+        public virtual double Age { get; set; }
 
         [SuppressNotify]
         public virtual bool IsEmpty { get; set; }

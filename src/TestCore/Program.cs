@@ -28,10 +28,14 @@ namespace IEVin.NotifyAutoImplementer.TestCore
                                          };
 
             model.Age = 1;
+            model.Age += 1e-16; // no change
+
             model.Name = "Test";
             model.Name = "Test";
             model.Name = "Test";
+
             model.Age++;
+
 
             model.IsEmpty = true;
             model.IsEmpty = true;
