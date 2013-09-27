@@ -3,20 +3,17 @@
 namespace IEVin.NotifyAutoImplementer.TestCore
 {
     [NotifyAllVirtualProperty]
-    public class TestModel : NotificationObject
+    public class TestModel : TestModelBase
     {
-        [NotifyProperty("Debug")]
-        public virtual string Name { get; set; }
-
-        [NotifyProperty("Debug")]
-        public virtual double Age { get; set; }
+        [NotifyProperty("ComboProperty")]
+        public virtual string StringNotifyProperty { get; set; }
 
         [SuppressNotify]
-        public virtual bool IsEmpty { get; set; }
+        public virtual bool SuppressNotifyProperty { get; set; }
 
-        public string Debug
+        public string ComboProperty
         {
-            get { return string.Format("Name={0}; Age={1};", Name, Age); }
+            get { return string.Format("StringNotifyProperty={0};", StringNotifyProperty); }
         }
     }
 }

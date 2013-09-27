@@ -54,7 +54,7 @@ namespace IEVin.NotifyAutoImplementer.Core
             {
                 var name = q.Name;
                 var gettet = q.GetGetMethod(true);
-                var setter = q.GetSetMethod(false);
+                var setter = q.GetSetMethod(true);
                 if(setter == null || !setter.IsVirtual)
                     continue;
 
