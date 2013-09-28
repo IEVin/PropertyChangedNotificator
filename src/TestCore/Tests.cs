@@ -138,6 +138,27 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             Assert.AreEqual(comboCounter, 1);
         }
 
+        [Test]
+        public void RefletionTest()
+        {
+            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+
+            var counter = 0;
+            SetChangedCounter(model, (TestModel x) => x.NotifyProperty, () => counter++);
+
+            try
+            {
+                var prop = model.GetType().GetProperty("NotifyProperty");
+                prop.SetValue(model, 1, null);
+            }
+            catch(System.Reflection.AmbiguousMatchException)
+            {
+                Assert.Fail();
+            }
+
+            Assert.AreEqual(counter, 1);
+        }
+
         static void SetChangedCounter<T, TValue>(INotifyPropertyChanged model, Expression<Func<T, TValue>> property, Action onChanged)
         {
             var name = ((MemberExpression)property.Body).Member.Name;

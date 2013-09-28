@@ -86,11 +86,8 @@ namespace IEVin.NotifyAutoImplementer.Core
                                          .Select(x => x.PropertyName ?? name)
                                          .Distinct();
 
-                var prop = tb.DefineProperty(name, q.Attributes, q.PropertyType, Type.EmptyTypes);
                 var newSetter = CreateSetMethod(tb, gettet, setter, notifyNames);
-
                 tb.DefineMethodOverride(newSetter, setter);
-                prop.SetSetMethod(newSetter);
             }
 
             return tb.CreateType();
