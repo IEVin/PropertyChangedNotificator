@@ -17,14 +17,28 @@ namespace IEVin.NotifyAutoImplementer.Core
         public static T CreateInstance<T>()
             where T : NotificationObject, new()
         {
-            var newType = GetOrCreateProxyType(typeof(T));
-            return (T)Activator.CreateInstance(newType);
+            try
+            {
+                var newType = GetOrCreateProxyType(typeof(T));
+                return (T)Activator.CreateInstance(newType);
+            }
+            catch(ArgumentException ex)
+            {
+                throw new ArgumentException(ex.Message, ex);
+            }
         }
 
         public static object CreateInstance(Type type)
         {
-            var newType = GetOrCreateProxyType(type);
-            return Activator.CreateInstance(newType);
+            try
+            {
+                var newType = GetOrCreateProxyType(type);
+                return Activator.CreateInstance(newType);
+            }
+            catch(ArgumentException ex)
+            {
+                throw new ArgumentException(ex.Message, "type", ex);
+            }
         }
 
         static Type GetOrCreateProxyType(Type baseType)
@@ -48,25 +62,32 @@ namespace IEVin.NotifyAutoImplementer.Core
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-            var allVirtual = Attribute.IsDefined(type, typeof(NotifyAllVirtualPropertyAttribute));
 
             foreach(var q in GetPropertyNames(type))
             {
                 var name = q.Name;
                 var gettet = q.GetGetMethod(true);
                 var setter = q.GetSetMethod(true);
-                if(setter == null || !setter.IsVirtual)
+                if(setter == null)
                     continue;
 
-                var notifyNames = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true)
-                                   .Cast<NotifyPropertyAttribute>()
-                                   .Select(x => x.PropertyName ?? name);
+                var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
 
-                if(allVirtual && !Attribute.IsDefined(q, typeof(SuppressNotifyAttribute)))
-                    notifyNames = notifyNames.Concat(new[] { name });
+                if(!setter.IsVirtual)
+                {
+                    if(!attribs.Any())
+                        continue;
+
+                    var msg = string.Format("Property '{0}' of type '{1}' must be virtual", q.Name, type.FullName);
+                    throw new ArgumentException(msg);
+                }
+
+                var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
+                                         .Select(x => x.PropertyName ?? name)
+                                         .Distinct();
 
                 var prop = tb.DefineProperty(name, q.Attributes, q.PropertyType, Type.EmptyTypes);
-                var newSetter = CreateSetMethod(tb, gettet, setter, notifyNames.Distinct());
+                var newSetter = CreateSetMethod(tb, gettet, setter, notifyNames);
 
                 tb.DefineMethodOverride(newSetter, setter);
                 prop.SetSetMethod(newSetter);

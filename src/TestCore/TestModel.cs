@@ -2,14 +2,11 @@
 
 namespace IEVin.NotifyAutoImplementer.TestCore
 {
-    [NotifyAllVirtualProperty]
     public class TestModel : TestModelBase
     {
+        [NotifyProperty]
         [NotifyProperty("ComboProperty")]
         public virtual string StringNotifyProperty { get; set; }
-
-        [SuppressNotify]
-        public virtual bool SuppressNotifyProperty { get; set; }
 
         public string ComboProperty
         {

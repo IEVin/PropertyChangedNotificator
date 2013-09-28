@@ -21,14 +21,4 @@ namespace IEVin.NotifyAutoImplementer.Core
             _propertyName = propertyName;
         }
     }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-    public class NotifyAllVirtualPropertyAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class SuppressNotifyAttribute : Attribute
-    {
-    }
 }

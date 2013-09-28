@@ -12,10 +12,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         public virtual int VirtualNotNotifyProperty { get; set; }
 
         [NotifyProperty]
-        public int NotVirtualNotifyProperty { get; set; }
-
         [NotifyProperty("OtherNotifyProperty")]
-        [NotifyProperty]
         public virtual int MultyNotifyProperty { get; set; }
 
         [NotifyProperty]

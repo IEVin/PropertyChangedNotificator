@@ -74,14 +74,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void NotVirtualNotifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
-
-            var counter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.NotVirtualNotifyProperty, () => counter++);
-
-            model.NotVirtualNotifyProperty = 1;
-
-            Assert.AreEqual(counter, 0);
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<FailedTestModel>());
         }
 
         [Test]
@@ -127,20 +120,6 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             SetChangedCounter(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
-            Assert.AreEqual(counter, 0);
-        }
-
-        [Test]
-        public void SuppressNotifyPropertyTest()
-        {
-            var model = NotifyImplementer.CreateInstance<TestModel>();
-            var counter = 0;
-            SetChangedCounter(model, (TestModel x) => x.SuppressNotifyProperty, () => counter++);
-
-            model.SuppressNotifyProperty = true;
-            Assert.AreEqual(counter, 0);
-
-            model.SuppressNotifyProperty = false;
             Assert.AreEqual(counter, 0);
         }
 
