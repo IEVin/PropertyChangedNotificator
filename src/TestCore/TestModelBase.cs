@@ -19,6 +19,9 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         public virtual int OtherNotifyProperty { get; set; }
 
         [NotifyProperty]
-        public virtual double DoublePropertyForPrecisionTest { get; set; }
+        public virtual double DoubleNotifyProperty { get; set; }
+
+        [NotifyProperty]
+        public virtual float FloatNotifyProperty { get; set; }
     }
 }

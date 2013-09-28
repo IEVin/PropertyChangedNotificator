@@ -12,15 +12,15 @@ namespace IEVin.NotifyAutoImplementer.Core
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
-        static readonly Dictionary<Guid, Type> s_cache = new Dictionary<Guid, Type>();
+        static readonly Dictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new Dictionary<Guid, Func<INotifyPropertyChanged>>();
 
         public static T CreateInstance<T>()
             where T : NotificationObject, new()
         {
             try
             {
-                var newType = GetOrCreateProxyType(typeof(T));
-                return (T)Activator.CreateInstance(newType);
+                var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+                return (T)ctor();
             }
             catch(ArgumentException ex)
             {
@@ -32,8 +32,8 @@ namespace IEVin.NotifyAutoImplementer.Core
         {
             try
             {
-                var newType = GetOrCreateProxyType(type);
-                return Activator.CreateInstance(newType);
+                var ctor = GetOrCreateProxyTypeCtor(type);
+                return ctor();
             }
             catch(ArgumentException ex)
             {
@@ -41,20 +41,20 @@ namespace IEVin.NotifyAutoImplementer.Core
             }
         }
 
-        static Type GetOrCreateProxyType(Type baseType)
+        static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type baseType)
         {
             var guid = baseType.GUID;
 
             //TODO: Add sync
-            Type type;
-            if(!s_cache.TryGetValue(guid, out type))
+            Func<INotifyPropertyChanged> ctor;
+            if(!s_cache.TryGetValue(guid, out ctor))
             {
-                type = CreateProxyType(baseType);
-                s_cache[guid] = type;
+                var type = CreateProxyType(baseType);
+                ctor = CreateConstructior(type);
+                s_cache[guid] = ctor;
             }
 
-            //TODO: Add dynamic method
-            return type;
+            return ctor;
         }
 
         static Type CreateProxyType(Type type)
@@ -78,7 +78,7 @@ namespace IEVin.NotifyAutoImplementer.Core
                     if(!attribs.Any())
                         continue;
 
-                    var msg = string.Format("Property '{0}' of type '{1}' must be virtual", q.Name, type.FullName);
+                    var msg = string.Format("Property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
                     throw new ArgumentException(msg);
                 }
 
@@ -136,6 +136,21 @@ namespace IEVin.NotifyAutoImplementer.Core
             il.Emit(OpCodes.Ret);
 
             return mb;
+        }
+
+        static Func<INotifyPropertyChanged> CreateConstructior(Type type)
+        {
+            var ctor = type.GetConstructor(Type.EmptyTypes);
+            if(ctor == null)
+                return () => (INotifyPropertyChanged)Activator.CreateInstance(type);
+
+            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(NotifyImplementer).Module);
+            var il = dm.GetILGenerator();
+
+            il.Emit(OpCodes.Newobj, ctor);
+            il.Emit(OpCodes.Ret);
+
+            return (Func<INotifyPropertyChanged>)dm.CreateDelegate(typeof(Func<INotifyPropertyChanged>));
         }
 
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)

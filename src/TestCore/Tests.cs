@@ -23,7 +23,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var counter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.NotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModelBase x) => x.NotifyProperty, () => counter++);
 
             // modify
             model.NotifyProperty = 1;
@@ -51,7 +51,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var counter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.NotNotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModelBase x) => x.NotNotifyProperty, () => counter++);
 
             model.NotifyProperty = 1;
 
@@ -64,7 +64,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var counter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.VirtualNotNotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModelBase x) => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
 
@@ -78,14 +78,14 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
-        public void DoubleNoifyPropertyTest()
+        public void MultyNoifyPropertyTest()
         {
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var doubleCounter = 0;
             var otherCounter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.MultyNotifyProperty, () => doubleCounter++);
-            SetChangedCounter(model, (TestModelBase x) => x.OtherNotifyProperty, () => otherCounter++);
+            SetChangedAction(model, (TestModelBase x) => x.MultyNotifyProperty, () => doubleCounter++);
+            SetChangedAction(model, (TestModelBase x) => x.OtherNotifyProperty, () => otherCounter++);
 
             model.MultyNotifyProperty = 1;
 
@@ -94,21 +94,40 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
-        public void PrecisionDoubleTest()
+        public void PrecisionDoubleNoifyPropertyTest()
         {
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var counter = 0;
-            SetChangedCounter(model, (TestModelBase x) => x.DoublePropertyForPrecisionTest, () => counter++);
+            SetChangedAction(model, (TestModelBase x) => x.DoubleNotifyProperty, () => counter++);
 
-            model.DoublePropertyForPrecisionTest = 1;
+            model.DoubleNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
 
             // very small number
-            model.DoublePropertyForPrecisionTest += 1e-17;
+            model.DoubleNotifyProperty += 1e-17;
             Assert.AreEqual(counter, 1);
 
-            model.DoublePropertyForPrecisionTest += 1e-14;
+            model.DoubleNotifyProperty += 1e-14;
+            Assert.AreEqual(counter, 2);
+        }
+
+        [Test]
+        public void PrecisionFloatNoifyPropertyTest()
+        {
+            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+
+            var counter = 0;
+            SetChangedAction(model, (TestModelBase x) => x.FloatNotifyProperty, () => counter++);
+
+            model.FloatNotifyProperty = 1;
+            Assert.AreEqual(counter, 1);
+
+            // very small number
+            model.FloatNotifyProperty += 1e-9f;
+            Assert.AreEqual(counter, 1);
+
+            model.FloatNotifyProperty += 1e-7f;
             Assert.AreEqual(counter, 2);
         }
 
@@ -117,7 +136,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         {
             var model = NotifyImplementer.CreateInstance<TestModel>();
             var counter = 0;
-            SetChangedCounter(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
             Assert.AreEqual(counter, 0);
@@ -130,10 +149,10 @@ namespace IEVin.NotifyAutoImplementer.TestCore
 
             var counter = 0;
             var comboCounter = 0;
-            SetChangedCounter(model, (TestModel x) => x.StringNotifyProperty, () => counter++);
-            SetChangedCounter(model, (TestModel x) => x.ComboProperty, () => comboCounter++);
+            SetChangedAction(model, (TestModel x) => x.StringNotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModel x) => x.ComboProperty, () => comboCounter++);
 
-            model.StringNotifyProperty = "1";
+            model.StringNotifyProperty = "Test";
             Assert.AreEqual(counter, 1);
             Assert.AreEqual(comboCounter, 1);
         }
@@ -144,7 +163,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = NotifyImplementer.CreateInstance<TestModelBase>();
 
             var counter = 0;
-            SetChangedCounter(model, (TestModel x) => x.NotifyProperty, () => counter++);
+            SetChangedAction(model, (TestModel x) => x.NotifyProperty, () => counter++);
 
             try
             {
@@ -159,7 +178,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             Assert.AreEqual(counter, 1);
         }
 
-        static void SetChangedCounter<T, TValue>(INotifyPropertyChanged model, Expression<Func<T, TValue>> property, Action onChanged)
+        static void SetChangedAction<T, TValue>(INotifyPropertyChanged model, Expression<Func<T, TValue>> property, Action onChanged)
         {
             var name = ((MemberExpression)property.Body).Member.Name;
 
