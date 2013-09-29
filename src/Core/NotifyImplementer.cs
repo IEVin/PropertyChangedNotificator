@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -10,9 +11,11 @@ namespace IEVin.NotifyAutoImplementer.Core
 {
     public static class NotifyImplementer
     {
+        static readonly object s_sync = new object();
+
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
-        static readonly Dictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new Dictionary<Guid, Func<INotifyPropertyChanged>>();
+        static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
 
         public static T CreateInstance<T>()
             where T : NotificationObject, new()
@@ -45,13 +48,19 @@ namespace IEVin.NotifyAutoImplementer.Core
         {
             var guid = baseType.GUID;
 
-            //TODO: Add sync
             Func<INotifyPropertyChanged> ctor;
-            if(!s_cache.TryGetValue(guid, out ctor))
+            if(s_cache.TryGetValue(guid, out ctor))
+                return ctor;
+
+            lock(s_sync)
             {
+                if(s_cache.TryGetValue(guid, out ctor))
+                    return ctor;
+
                 var type = CreateProxyType(baseType);
                 ctor = CreateConstructior(type);
-                s_cache[guid] = ctor;
+
+                s_cache.TryAdd(guid, ctor);
             }
 
             return ctor;
