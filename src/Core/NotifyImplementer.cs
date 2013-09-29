@@ -71,23 +71,31 @@ namespace IEVin.NotifyAutoImplementer.Core
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-
             foreach(var q in GetPropertyNames(type))
             {
-                var name = q.Name;
-                var gettet = q.GetGetMethod(true);
-                var setter = q.GetSetMethod(true);
-                if(setter == null)
+                var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
+                if(!attribs.Any())
                     continue;
 
-                var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
+                var name = q.Name;
+                var getter = q.GetGetMethod(true);
+                var setter = q.GetSetMethod(true);
+
+                if(getter == null || getter.IsPrivate || getter.IsAssembly)
+                {
+                    var msg = string.Format("Getter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    throw new ArgumentException(msg);
+                }
+
+                if(setter == null || setter.IsPrivate || setter.IsAssembly)
+                {
+                    var msg = string.Format("Setter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    throw new ArgumentException(msg);
+                }
 
                 if(!setter.IsVirtual)
                 {
-                    if(!attribs.Any())
-                        continue;
-
-                    var msg = string.Format("Property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
+                    var msg = string.Format("Setter property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
                     throw new ArgumentException(msg);
                 }
 
@@ -95,7 +103,7 @@ namespace IEVin.NotifyAutoImplementer.Core
                                          .Select(x => x.PropertyName ?? name)
                                          .Distinct();
 
-                var newSetter = CreateSetMethod(tb, gettet, setter, notifyNames);
+                var newSetter = CreateSetMethod(tb, getter, setter, notifyNames);
                 tb.DefineMethodOverride(newSetter, setter);
             }
 
@@ -166,7 +174,7 @@ namespace IEVin.NotifyAutoImplementer.Core
         {
             // TODO: verify implementation
             return type != null
-                       ? type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty)
+                       ? type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
                        : Enumerable.Empty<PropertyInfo>();
         }
 

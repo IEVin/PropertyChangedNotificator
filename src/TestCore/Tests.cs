@@ -9,14 +9,6 @@ namespace IEVin.NotifyAutoImplementer.TestCore
     [TestFixture]
     public class Tests
     {
-        [TestFixtureSetUp]
-        public void Init()
-        {
-            // precompile test model
-            NotifyImplementer.CreateInstance<TestModel>();
-            NotifyImplementer.CreateInstance<TestModelBase>();
-        }
-
         [Test]
         public void SimpleNotifyPropertyTest()
         {
@@ -72,9 +64,15 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
-        public void NotVirtualNotifyPropertyTest()
+        public void FailedModelTest()
         {
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<FailedTestModel>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<NotVirtualModel>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<InternalGetModel>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<InternalSetModel>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<PrivateGetModel>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<PrivateSetModel>());
+
+            Assert.DoesNotThrow(() => NotifyImplementer.CreateInstance<NotPublicModel>());
         }
 
         [Test]
@@ -165,15 +163,11 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var counter = 0;
             SetChangedAction(model, (TestModel x) => x.NotifyProperty, () => counter++);
 
-            try
-            {
-                var prop = model.GetType().GetProperty("NotifyProperty");
-                prop.SetValue(model, 1, null);
-            }
-            catch(System.Reflection.AmbiguousMatchException)
-            {
-                Assert.Fail();
-            }
+            Assert.DoesNotThrow(() =>
+                                    {
+                                        var prop = model.GetType().GetProperty("NotifyProperty");
+                                        prop.SetValue(model, 1, null);
+                                    });
 
             Assert.AreEqual(counter, 1);
         }
