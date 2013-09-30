@@ -11,8 +11,6 @@ namespace IEVin.NotifyAutoImplementer.Core
 {
     public static class NotifyImplementer
     {
-        static readonly object s_sync = new object();
-
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
         static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
@@ -44,26 +42,19 @@ namespace IEVin.NotifyAutoImplementer.Core
             }
         }
 
-        static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type baseType)
+        static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
         {
-            var guid = baseType.GUID;
+            var guid = type.GUID;
 
             Func<INotifyPropertyChanged> ctor;
             if(s_cache.TryGetValue(guid, out ctor))
                 return ctor;
 
-            lock(s_sync)
-            {
-                if(s_cache.TryGetValue(guid, out ctor))
-                    return ctor;
-
-                var type = CreateProxyType(baseType);
-                ctor = CreateConstructior(type);
-
-                s_cache.TryAdd(guid, ctor);
-            }
-
-            return ctor;
+            return s_cache.GetOrAdd(guid, x =>
+                                              {
+                                                  var proxyType = CreateProxyType(type);
+                                                  return CreateConstructior(proxyType);
+                                              });
         }
 
         static Type CreateProxyType(Type type)
