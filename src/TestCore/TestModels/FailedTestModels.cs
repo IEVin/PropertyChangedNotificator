@@ -1,6 +1,6 @@
 ﻿using IEVin.NotifyAutoImplementer.Core;
 
-namespace IEVin.NotifyAutoImplementer.TestCore
+namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
 {
     public class NotVirtualModel : NotificationObject
     {

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using IEVin.NotifyAutoImplementer.Core;
+using IEVin.NotifyAutoImplementer.TestCore.TestModels;
 using NUnit.Framework;
 
 namespace IEVin.NotifyAutoImplementer.TestCore
