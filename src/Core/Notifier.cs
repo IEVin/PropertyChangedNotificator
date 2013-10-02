@@ -9,13 +9,13 @@ using IEVin.NotifyAutoImplementer.Core.Helper;
 
 namespace IEVin.NotifyAutoImplementer.Core
 {
-    public static class NotifyImplementer
+    public static class Notifier
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
         static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
 
-        public static T CreateInstance<T>()
+        public static T Of<T>()
             where T : INotifyPropertyChanged, new()
         {
             try
@@ -29,7 +29,7 @@ namespace IEVin.NotifyAutoImplementer.Core
             }
         }
 
-        public static object CreateInstance(Type type)
+        public static object Of(Type type)
         {
             if(type == null)
                 throw new ArgumentNullException("type");
@@ -162,7 +162,7 @@ namespace IEVin.NotifyAutoImplementer.Core
             if(ctor == null)
                 return () => (INotifyPropertyChanged)Activator.CreateInstance(type);
 
-            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(NotifyImplementer).Module);
+            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(Notifier).Module);
             var il = dm.GetILGenerator();
 
             il.Emit(OpCodes.Newobj, ctor);

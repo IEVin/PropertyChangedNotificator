@@ -13,7 +13,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void SimpleNotifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModelBase x) => x.NotifyProperty, () => counter++);
@@ -41,7 +41,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void NotNotifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModelBase x) => x.NotNotifyProperty, () => counter++);
@@ -54,7 +54,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void VirtualNotNotifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModelBase x) => x.VirtualNotNotifyProperty, () => counter++);
@@ -67,39 +67,39 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void FailedModelTest()
         {
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<NotVirtualModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<InternalGetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<InternalSetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<PrivateGetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<PrivateSetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<NotVirtualModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<InternalGetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<InternalSetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<PrivateGetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<PrivateSetModel>());
 
-            Assert.DoesNotThrow(() => NotifyImplementer.CreateInstance<NotPublicModel>());
+            Assert.DoesNotThrow(() => Notifier.Of<NotPublicModel>());
         }
 
         [Test]
         public void FailedInvocatorTest()
         {
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithoutInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithInvalideInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithInvalideInvocator2>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithNotPublicInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithMultyInvocator>());
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance(typeof(ModelWithAbstractInvocator)));
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<ModelWithoutInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<ModelWithInvalideInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<ModelWithInvalideInvocator2>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<ModelWithNotPublicInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => Notifier.Of<ModelWithMultyInvocator>());
+            Assert.Throws(typeof(ArgumentException), () => Notifier.Of(typeof(ModelWithAbstractInvocator)));
 
-            Assert.DoesNotThrow(() => NotifyImplementer.CreateInstance<ModelWithCorrectInvocator>());
+            Assert.DoesNotThrow(() => Notifier.Of<ModelWithCorrectInvocator>());
         }
 
         [Test]
         public void FailedTypeTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => NotifyImplementer.CreateInstance(null));
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance(typeof(object)));
+            Assert.Throws(typeof(ArgumentNullException), () => Notifier.Of(null));
+            Assert.Throws(typeof(ArgumentException), () => Notifier.Of(typeof(object)));
         }
 
         [Test]
         public void MultyNoifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var doubleCounter = 0;
             var otherCounter = 0;
@@ -115,7 +115,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void PrecisionDoubleNoifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModelBase x) => x.DoubleNotifyProperty, () => counter++);
@@ -134,7 +134,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void PrecisionFloatNoifyPropertyTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModelBase x) => x.FloatNotifyProperty, () => counter++);
@@ -153,7 +153,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void VirtualNotNotifyPropertyInDerivedClassTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModel>();
+            var model = Notifier.Of<TestModel>();
             var counter = 0;
             SetChangedAction(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
 
@@ -164,7 +164,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void StringNotifyProperty()
         {
-            var model = NotifyImplementer.CreateInstance<TestModel>();
+            var model = Notifier.Of<TestModel>();
 
             var counter = 0;
             var comboCounter = 0;
@@ -179,7 +179,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void RefletionTest()
         {
-            var model = NotifyImplementer.CreateInstance<TestModelBase>();
+            var model = Notifier.Of<TestModelBase>();
 
             var counter = 0;
             SetChangedAction(model, (TestModel x) => x.NotifyProperty, () => counter++);
