@@ -71,7 +71,7 @@ namespace IEVin.NotifyAutoImplementer.Core
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-            var raiseMi = NotifyAutoImplementerEqualsHelper.GetRaise(type);
+            var raiseMi = NotifyAutoImplementerHelper.GetRaise(type);
 
             foreach(var q in GetPropertyNames(type))
             {
@@ -101,20 +101,27 @@ namespace IEVin.NotifyAutoImplementer.Core
                     throw new InvalidOperationException(msg);
                 }
 
+
+                var precision = q.GetCustomAttributes(typeof(SetPrecisionAttribute), true)
+                                 .Cast<SetPrecisionAttribute>()
+                                 .Select(x => (double?)x.Precision)
+                                 .FirstOrDefault();
+
+                var equalsMi = NotifyAutoImplementerHelper.GetEquals(getter.ReturnType, ref precision);
+
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
-                                         .Select(x => x.PropertyName ?? name)
-                                         .Distinct();
+                         .Select(x => x.PropertyName ?? name)
+                         .Distinct();
 
-                var equalsMi = NotifyAutoImplementerEqualsHelper.GetEquals(getter.ReturnType);
-
-                var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi);
+                var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi, precision);
                 tb.DefineMethodOverride(newSetter, setter);
             }
 
             return tb.CreateType();
         }
 
-        static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi, IEnumerable<string> names, MethodInfo raise, MethodInfo equals)
+        static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi,
+                                             IEnumerable<string> names, MethodInfo raise, MethodInfo equals, double? eps)
         {
             var paramTypes = setMi.GetParameters()
                                   .Select(x => x.ParameterType)
@@ -131,6 +138,8 @@ namespace IEVin.NotifyAutoImplementer.Core
 
             // invoke equals
             il.Emit(OpCodes.Ldarg_1);
+            if(eps != null)
+                il.Emit(OpCodes.Ldc_R8, eps.Value);
             il.Emit(OpCodes.Call, equals);
 
             // jump if equals

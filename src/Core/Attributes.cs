@@ -26,4 +26,20 @@ namespace IEVin.NotifyAutoImplementer.Core
     public class NotificationInvocatorAttribute : Attribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
+    public class SetPrecisionAttribute : Attribute
+    {
+        readonly double _precision;
+
+        public double Precision
+        {
+            get { return _precision; }
+        }
+
+        public SetPrecisionAttribute(double precision)
+        {
+            _precision = precision;
+        }
+    }
 }

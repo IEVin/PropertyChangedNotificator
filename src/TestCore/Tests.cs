@@ -113,7 +113,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
-        public void PrecisionDoubleNoifyPropertyTest()
+        public void DefaultPrecisionDoubleNoifyPropertyTest()
         {
             var model = Notificator.Of<TestModelBase>();
 
@@ -132,7 +132,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
-        public void PrecisionFloatNoifyPropertyTest()
+        public void DefaultPrecisionFloatNoifyPropertyTest()
         {
             var model = Notificator.Of<TestModelBase>();
 
@@ -174,6 +174,69 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             model.StringNotifyProperty = "Test";
             Assert.AreEqual(counter, 1);
             Assert.AreEqual(comboCounter, 1);
+        }
+
+        [Test]
+        public void PrecisionDoubleNotifyPropertyTest()
+        {
+            var model = Notificator.Of<TestModel>();
+
+            var counter = 0;
+            SetChangedAction(model, (TestModel x) => x.DoublePrecisionNotifyProperty, () => counter++);
+
+            model.DoublePrecisionNotifyProperty = 1;
+            Assert.AreEqual(counter, 1);
+
+            model.DoublePrecisionNotifyProperty += 1e-10;
+            Assert.AreEqual(counter, 2);
+
+            model.DoublePrecisionNotifyProperty += 1e-11;
+            Assert.AreEqual(counter, 2);
+
+            model.DoublePrecisionNotifyProperty += 1e-9;
+            Assert.AreEqual(counter, 3);
+        }
+
+        [Test]
+        public void PrecisionFloatNotifyPropertyTest()
+        {
+            var model = Notificator.Of<TestModel>();
+
+            var counter = 0;
+            SetChangedAction(model, (TestModel x) => x.FloatPrecisionNotifyProperty, () => counter++);
+
+            model.FloatPrecisionNotifyProperty = 1f;
+            Assert.AreEqual(counter, 1);
+
+            model.FloatPrecisionNotifyProperty += 1e-4f;
+            Assert.AreEqual(counter, 1);
+
+            model.FloatPrecisionNotifyProperty += 1e-3f;
+            Assert.AreEqual(counter, 2);
+
+            model.FloatPrecisionNotifyProperty = 1f;
+            Assert.AreEqual(counter, 3);
+        }
+
+        [Test]
+        public void PrecisionDecimalNotifyPropertyTest()
+        {
+            var model = Notificator.Of<TestModel>();
+
+            var counter = 0;
+            SetChangedAction(model, (TestModel x) => x.DecimalPrecisionNotifyProperty, () => counter++);
+
+            model.DecimalPrecisionNotifyProperty = 2;
+            Assert.AreEqual(counter, 1);
+
+            model.DecimalPrecisionNotifyProperty += 1e-24m;
+            Assert.AreEqual(counter, 2);
+
+            model.DecimalPrecisionNotifyProperty += 1e-26m;
+            Assert.AreEqual(counter, 2);
+
+            model.DecimalPrecisionNotifyProperty += 1e-25m;
+            Assert.AreEqual(counter, 3);
         }
 
         [Test]
