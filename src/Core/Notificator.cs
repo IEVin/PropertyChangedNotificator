@@ -9,7 +9,7 @@ using IEVin.NotifyAutoImplementer.Core.Helper;
 
 namespace IEVin.NotifyAutoImplementer.Core
 {
-    public static class Notifier
+    public static class Notificator
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
@@ -162,7 +162,7 @@ namespace IEVin.NotifyAutoImplementer.Core
             if(ctor == null)
                 return () => (INotifyPropertyChanged)Activator.CreateInstance(type);
 
-            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(Notifier).Module);
+            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(Notificator).Module);
             var il = dm.GetILGenerator();
 
             il.Emit(OpCodes.Newobj, ctor);
