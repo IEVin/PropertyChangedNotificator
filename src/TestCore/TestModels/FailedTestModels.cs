@@ -1,4 +1,5 @@
-﻿using IEVin.NotifyAutoImplementer.Core;
+﻿using System.ComponentModel;
+using IEVin.NotifyAutoImplementer.Core;
 
 namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
 {
@@ -30,5 +31,66 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         [NotifyProperty]
         public virtual int NotifyProperty { get; private set; }
+    }
+
+    public class ModelWithoutInvocator : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    public class ModelWithInvalideInvocator : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyInvocator]
+        public void RaisePropertyChanged()
+        {
+        }
+    }
+
+    public class ModelWithInvalideInvocator2 : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyInvocator]
+        public string RaisePropertyChanged(string str)
+        {
+            return null;
+        }
+    }
+
+    public class ModelWithNotPublicInvocator : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyInvocator]
+        internal void RaisePropertyChanged(string str)
+        {
+        }
+    }
+
+    public class ModelWithMultyInvocator : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyInvocator]
+        public void RaisePropertyChanged(string str)
+        {
+        }
+
+        [NotifyInvocator]
+        public void OnPropertyChanged(string str)
+        {
+        }
+    }
+
+    public abstract class ModelWithAbstractInvocator : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyInvocator]
+        protected void OnPropertyChanged(string propertyName)
+        {
+        }
     }
 }

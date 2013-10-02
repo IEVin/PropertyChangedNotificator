@@ -21,4 +21,9 @@ namespace IEVin.NotifyAutoImplementer.Core
             _propertyName = propertyName;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class NotifyInvocatorAttribute : Attribute
+    {
+    }
 }

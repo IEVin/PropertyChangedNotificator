@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace IEVin.NotifyAutoImplementer.Core.Helper
@@ -10,12 +11,19 @@ namespace IEVin.NotifyAutoImplementer.Core.Helper
             return func.Method;
         }
 
-
-        internal static MethodInfo GetRaise()
+        internal static MethodInfo GetRaise(Type type)
         {
-            //TODO: add find by attribute
-            return typeof(NotificationObject)
-                .GetMethod("RaisePropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic);
+            var mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                         .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
+                         .Single(x => x.GetCustomAttributes(typeof(NotifyInvocatorAttribute), true).Any());
+
+            var prms = mi.GetParameters();
+
+            // Check signature
+            if(mi.ReturnType != typeof(void) || prms.Length != 1 || prms[0].ParameterType != typeof(string))
+                throw new InvalidOperationException("Invalide signature of notify property changed invocator.");
+
+            return mi;
         }
 
         internal static MethodInfo GetEquals(Type type)

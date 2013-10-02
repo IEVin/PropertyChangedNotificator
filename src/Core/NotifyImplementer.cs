@@ -16,29 +16,38 @@ namespace IEVin.NotifyAutoImplementer.Core
         static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
 
         public static T CreateInstance<T>()
-            where T : NotificationObject, new()
+            where T : INotifyPropertyChanged, new()
         {
             try
             {
                 var ctor = GetOrCreateProxyTypeCtor(typeof(T));
                 return (T)ctor();
             }
-            catch(ArgumentException ex)
+            catch(InvalidOperationException ex)
             {
-                throw new ArgumentException(ex.Message, ex);
+                throw new InvalidOperationException(ex.Message, ex);
             }
         }
 
         public static object CreateInstance(Type type)
         {
+            if(type == null)
+                throw new ArgumentNullException("type");
+
+            if(!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
+                throw new ArgumentException("Type must implement INotifyPropertyChanged.");
+
+            if(type.IsAbstract)
+                throw new ArgumentException("Type сannot be abstract.");
+
             try
             {
                 var ctor = GetOrCreateProxyTypeCtor(type);
                 return ctor();
             }
-            catch(ArgumentException ex)
+            catch(InvalidOperationException ex)
             {
-                throw new ArgumentException(ex.Message, "type", ex);
+                throw new InvalidOperationException(ex.Message, ex);
             }
         }
 
@@ -62,6 +71,8 @@ namespace IEVin.NotifyAutoImplementer.Core
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
+            var raiseMi = NotifyAutoImplementerEqualsHelper.GetRaise(type);
+
             foreach(var q in GetPropertyNames(type))
             {
                 var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
@@ -75,42 +86,41 @@ namespace IEVin.NotifyAutoImplementer.Core
                 if(getter == null || getter.IsPrivate || getter.IsAssembly)
                 {
                     var msg = string.Format("Getter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
-                    throw new ArgumentException(msg);
+                    throw new InvalidOperationException(msg);
                 }
 
                 if(setter == null || setter.IsPrivate || setter.IsAssembly)
                 {
                     var msg = string.Format("Setter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
-                    throw new ArgumentException(msg);
+                    throw new InvalidOperationException(msg);
                 }
 
                 if(!setter.IsVirtual)
                 {
                     var msg = string.Format("Setter property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
-                    throw new ArgumentException(msg);
+                    throw new InvalidOperationException(msg);
                 }
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
                                          .Select(x => x.PropertyName ?? name)
                                          .Distinct();
 
-                var newSetter = CreateSetMethod(tb, getter, setter, notifyNames);
+                var equalsMi = NotifyAutoImplementerEqualsHelper.GetEquals(getter.ReturnType);
+
+                var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi);
                 tb.DefineMethodOverride(newSetter, setter);
             }
 
             return tb.CreateType();
         }
 
-        static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi, IEnumerable<string> names)
+        static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi, IEnumerable<string> names, MethodInfo raise, MethodInfo equals)
         {
             var paramTypes = setMi.GetParameters()
                                   .Select(x => x.ParameterType)
                                   .ToArray();
 
             var mb = tb.DefineMethod(setMi.Name, setMi.Attributes, null, paramTypes);
-
-            var equals = NotifyAutoImplementerEqualsHelper.GetEquals(getMi.ReturnType);
-            var raise = NotifyAutoImplementerEqualsHelper.GetRaise();
 
             var il = mb.GetILGenerator();
             var label = il.DefineLabel();

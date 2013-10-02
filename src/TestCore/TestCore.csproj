@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestModels\FailedTestModels.cs" />
+    <Compile Include="TestModels\ModelWithCorrectInvocator.cs" />
     <Compile Include="TestModels\NotPublicModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestModels\TestModel.cs" />

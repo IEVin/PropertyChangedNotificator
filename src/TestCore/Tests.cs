@@ -67,13 +67,33 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void FailedModelTest()
         {
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<NotVirtualModel>());
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<InternalGetModel>());
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<InternalSetModel>());
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<PrivateGetModel>());
-            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance<PrivateSetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<NotVirtualModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<InternalGetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<InternalSetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<PrivateGetModel>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<PrivateSetModel>());
 
             Assert.DoesNotThrow(() => NotifyImplementer.CreateInstance<NotPublicModel>());
+        }
+
+        [Test]
+        public void FailedInvocatorTest()
+        {
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithoutInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithInvalideInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithInvalideInvocator2>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithNotPublicInvocator>());
+            Assert.Throws(typeof(InvalidOperationException), () => NotifyImplementer.CreateInstance<ModelWithMultyInvocator>());
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance(typeof(ModelWithAbstractInvocator)));
+
+            Assert.DoesNotThrow(() => NotifyImplementer.CreateInstance<ModelWithCorrectInvocator>());
+        }
+
+        [Test]
+        public void FailedTypeTest()
+        {
+            Assert.Throws(typeof(ArgumentNullException), () => NotifyImplementer.CreateInstance(null));
+            Assert.Throws(typeof(ArgumentException), () => NotifyImplementer.CreateInstance(typeof(object)));
         }
 
         [Test]
