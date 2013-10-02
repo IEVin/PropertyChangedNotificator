@@ -7,7 +7,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         protected void OnPropertyChanged(string prop)
         {
         }

@@ -6,7 +6,7 @@ namespace IEVin.NotifyAutoImplementer.Core
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         protected void RaisePropertyChanged(string propertyName)
         {
             var handler = PropertyChanged;

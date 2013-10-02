@@ -23,7 +23,7 @@ namespace IEVin.NotifyAutoImplementer.Core
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class NotifyInvocatorAttribute : Attribute
+    public class NotificationInvocatorAttribute : Attribute
     {
     }
 }

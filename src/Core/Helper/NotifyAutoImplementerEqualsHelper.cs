@@ -15,7 +15,7 @@ namespace IEVin.NotifyAutoImplementer.Core.Helper
         {
             var mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                          .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
-                         .Single(x => x.GetCustomAttributes(typeof(NotifyInvocatorAttribute), true).Any());
+                         .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
 
             var prms = mi.GetParameters();
 

@@ -42,7 +42,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         public void RaisePropertyChanged()
         {
         }
@@ -52,7 +52,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         public string RaisePropertyChanged(string str)
         {
             return null;
@@ -63,7 +63,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         internal void RaisePropertyChanged(string str)
         {
         }
@@ -73,12 +73,12 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         public void RaisePropertyChanged(string str)
         {
         }
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         public void OnPropertyChanged(string str)
         {
         }
@@ -88,7 +88,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyInvocator]
+        [NotificationInvocator]
         protected void OnPropertyChanged(string propertyName)
         {
         }
