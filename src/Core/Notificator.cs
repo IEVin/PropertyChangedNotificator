@@ -182,7 +182,6 @@ namespace IEVin.NotifyAutoImplementer.Core
 
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {
-            // TODO: verify implementation
             return type != null
                        ? type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
                        : Enumerable.Empty<PropertyInfo>();
