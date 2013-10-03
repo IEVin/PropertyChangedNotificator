@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IEVin.NotifyAutoImplementer")]
+[assembly: AssemblyTitle("IEVin.NotifyAutoImplementer.TestCore")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("IEVin.NotifyAutoImplementer")]
+[assembly: AssemblyProduct("IEVin.NotifyAutoImplementer.TestCore")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6a968165-a5a8-46cd-b3ac-ccabdc718d28")]
+[assembly: Guid("3558ae0b-4486-4a97-99c8-079f91de8543")]
 
 // Version information for an assembly consists of the following four values:
 //
