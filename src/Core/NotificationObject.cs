@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
 
 namespace IEVin.NotifyAutoImplementer.Core
 {
@@ -12,6 +14,12 @@ namespace IEVin.NotifyAutoImplementer.Core
             var handler = PropertyChanged;
             if(handler != null)
                 handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected void RaisePropertyChanged<T>(Expression<Func<T>> expression)
+        {
+            var name = ((MemberExpression)expression.Body).Member.Name;
+            RaisePropertyChanged(name);
         }
     }
 }

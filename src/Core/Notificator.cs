@@ -18,9 +18,13 @@ namespace IEVin.NotifyAutoImplementer.Core
         public static T Of<T>()
             where T : INotifyPropertyChanged, new()
         {
+            var type = typeof(T);
+            if(type.IsAbstract || type.IsSealed)
+                throw new ArgumentException("Type сannot be abstract or sealed.");
+
             try
             {
-                var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+                var ctor = GetOrCreateProxyTypeCtor(type);
                 return (T)ctor();
             }
             catch(InvalidOperationException ex)
@@ -37,8 +41,8 @@ namespace IEVin.NotifyAutoImplementer.Core
             if(!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
                 throw new ArgumentException("Type must implement INotifyPropertyChanged.");
 
-            if(type.IsAbstract)
-                throw new ArgumentException("Type сannot be abstract.");
+            if(type.IsAbstract || type.IsSealed)
+                throw new ArgumentException("Type сannot be abstract or sealed.");
 
             try
             {
@@ -110,8 +114,8 @@ namespace IEVin.NotifyAutoImplementer.Core
                 var equalsMi = NotifyAutoImplementerHelper.GetEquals(getter.ReturnType, ref precision);
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
-                         .Select(x => x.PropertyName ?? name)
-                         .Distinct();
+                                         .Select(x => x.PropertyName ?? name)
+                                         .Distinct();
 
                 var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi, precision);
                 tb.DefineMethodOverride(newSetter, setter);

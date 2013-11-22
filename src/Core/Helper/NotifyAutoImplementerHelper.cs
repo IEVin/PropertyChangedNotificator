@@ -39,7 +39,7 @@ namespace IEVin.NotifyAutoImplementer.Core.Helper
             // precision only for double, float and decimal
             precision = null;
 
-            if (type == typeof(String))
+            if(type == typeof(String))
                 return GetMethodInfo<String>(String.Equals);
 
             var method = type.IsClass ? "EqualsRef" : "EqualsVal";
@@ -58,7 +58,7 @@ namespace IEVin.NotifyAutoImplementer.Core.Helper
             var prms = mi.GetParameters();
 
             // Check signature
-            if (mi.ReturnType != typeof(void) || prms.Length != 1 || prms[0].ParameterType != typeof(string))
+            if(mi.ReturnType != typeof(void) || prms.Length != 1 || prms[0].ParameterType != typeof(string))
                 throw new InvalidOperationException("Invalide signature of notify property changed invocator.");
 
             return mi;
