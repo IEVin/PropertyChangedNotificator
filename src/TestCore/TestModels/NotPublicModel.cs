@@ -1,6 +1,4 @@
-﻿using IEVin.NotifyAutoImplementer.Core;
-
-namespace IEVin.NotifyAutoImplementer.TestCore.TestModels
+﻿namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
 {
     public class NotPublicModel : NotificationObject
     {

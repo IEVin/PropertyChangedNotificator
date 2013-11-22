@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Linq;
 using System.Reflection.Emit;
-using IEVin.NotifyAutoImplementer.Core.Helper;
+using IEVin.PropertyChangedNotificator.Helper;
 
-namespace IEVin.NotifyAutoImplementer.Core
+namespace IEVin.PropertyChangedNotificator
 {
     public static class Notificator
     {

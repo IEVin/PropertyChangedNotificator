@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using IEVin.NotifyAutoImplementer.Core;
-using IEVin.NotifyAutoImplementer.TestCore.TestModels;
+using IEVin.PropertyChangedNotificator.TestCore.TestModels;
 using NUnit.Framework;
 
-namespace IEVin.NotifyAutoImplementer.TestCore
+namespace IEVin.PropertyChangedNotificator.TestCore
 {
     [TestFixture]
     public class Tests

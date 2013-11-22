@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace IEVin.NotifyAutoImplementer.Core.Helper
+namespace IEVin.PropertyChangedNotificator.Helper
 {
     public static class NotifyAutoImplementerHelper
     {

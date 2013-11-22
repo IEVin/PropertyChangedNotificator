@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace IEVin.NotifyAutoImplementer.Core
+namespace IEVin.PropertyChangedNotificator
 {
     public abstract class NotificationObject : INotifyPropertyChanged
     {
