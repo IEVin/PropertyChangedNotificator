@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace IEVin.PropertyChangedNotificator.Helper
 {
-    public static class NotifyAutoImplementerHelper
+    public static class PropertyChangedNotificatorHelper
     {
         static MethodInfo GetMethodInfo<T>(Func<T, T, bool> func)
         {
@@ -44,7 +44,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
 
             var method = type.IsClass ? "EqualsRef" : "EqualsVal";
 
-            return typeof(NotifyAutoImplementerHelper)
+            return typeof(PropertyChangedNotificatorHelper)
                 .GetMethod(method, BindingFlags.Static | BindingFlags.Public)
                 .MakeGenericMethod(type);
         }

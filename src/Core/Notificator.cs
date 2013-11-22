@@ -75,7 +75,7 @@ namespace IEVin.PropertyChangedNotificator
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-            var raiseMi = NotifyAutoImplementerHelper.GetRaise(type);
+            var raiseMi = PropertyChangedNotificatorHelper.GetRaise(type);
 
             foreach(var q in GetPropertyNames(type))
             {
@@ -111,7 +111,7 @@ namespace IEVin.PropertyChangedNotificator
                                  .Select(x => (double?)x.Precision)
                                  .FirstOrDefault();
 
-                var equalsMi = NotifyAutoImplementerHelper.GetEquals(getter.ReturnType, ref precision);
+                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, ref precision);
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
                                          .Select(x => x.PropertyName ?? name)

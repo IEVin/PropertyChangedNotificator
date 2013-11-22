@@ -37,7 +37,7 @@
   <ItemGroup>
     <Compile Include="Attributes.cs" />
     <Compile Include="Notificator.cs" />
-    <Compile Include="Helper\NotifyAutoImplementerHelper.cs" />
+    <Compile Include="Helper\PropertyChangedNotificatorHelper.cs" />
     <Compile Include="NotificationObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
