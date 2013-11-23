@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reflection;
 
-namespace IEVin.NotifyAutoImplementer.Core.Helper
+namespace IEVin.PropertyChangedNotificator.Helper
 {
-    public static class NotifyAutoImplementerHelper
+    public static class PropertyChangedNotificatorHelper
     {
         static MethodInfo GetMethodInfo<T>(Func<T, T, bool> func)
         {
@@ -39,26 +39,36 @@ namespace IEVin.NotifyAutoImplementer.Core.Helper
             // precision only for double, float and decimal
             precision = null;
 
-            if (type == typeof(String))
+            if(type == typeof(String))
                 return GetMethodInfo<String>(String.Equals);
 
             var method = type.IsClass ? "EqualsRef" : "EqualsVal";
 
-            return typeof(NotifyAutoImplementerHelper)
+            return typeof(PropertyChangedNotificatorHelper)
                 .GetMethod(method, BindingFlags.Static | BindingFlags.Public)
                 .MakeGenericMethod(type);
         }
 
         internal static MethodInfo GetRaise(Type type)
         {
-            var mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                         .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
-                         .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
+            MethodInfo mi;
+
+            try
+            {
+                mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                              .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
+                              .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
+            }
+            catch(Exception ex)
+            {
+                var msg = string.Format("Type '{0}' contains no single method marked NotificationInvocatorAttribute.", type.FullName);
+                throw new InvalidOperationException(msg, ex);
+            }
 
             var prms = mi.GetParameters();
 
             // Check signature
-            if (mi.ReturnType != typeof(void) || prms.Length != 1 || prms[0].ParameterType != typeof(string))
+            if(mi.ReturnType != typeof(void) || prms.Length != 1 || prms[0].ParameterType != typeof(string))
                 throw new InvalidOperationException("Invalide signature of notify property changed invocator.");
 
             return mi;

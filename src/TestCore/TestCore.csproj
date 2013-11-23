@@ -8,7 +8,7 @@
     <ProjectGuid>{B0523D6A-9D80-4F34-9094-BAF98C18FB3E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IEVin.NotifyAutoImplementer.TestCore</RootNamespace>
+    <RootNamespace>IEVin.PropertyChangedNotificator.TestCore</RootNamespace>
     <AssemblyName>TestCore</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestModels\AbstractModel.cs" />
     <Compile Include="TestModels\FailedTestModels.cs" />
     <Compile Include="TestModels\ModelWithCorrectInvocator.cs" />
     <Compile Include="TestModels\NotPublicModel.cs" />

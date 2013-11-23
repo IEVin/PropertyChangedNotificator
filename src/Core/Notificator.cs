@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Linq;
 using System.Reflection.Emit;
-using IEVin.NotifyAutoImplementer.Core.Helper;
+using IEVin.PropertyChangedNotificator.Helper;
 
-namespace IEVin.NotifyAutoImplementer.Core
+namespace IEVin.PropertyChangedNotificator
 {
     public static class Notificator
     {
@@ -15,44 +15,38 @@ namespace IEVin.NotifyAutoImplementer.Core
 
         static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
 
+
         public static T Of<T>()
             where T : INotifyPropertyChanged, new()
         {
-            try
-            {
-                var ctor = GetOrCreateProxyTypeCtor(typeof(T));
-                return (T)ctor();
-            }
-            catch(InvalidOperationException ex)
-            {
-                throw new InvalidOperationException(ex.Message, ex);
-            }
+            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+            return (T)ctor();
         }
 
-        public static object Of(Type type)
+        public static Func<T> ConstructorOf<T>()
+            where T : INotifyPropertyChanged, new()
         {
-            if(type == null)
+            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+            return () => (T)ctor();
+        }
+
+        public static Func<INotifyPropertyChanged> ConstructorOf(Type type)
+        {
+            if (type == null)
                 throw new ArgumentNullException("type");
 
-            if(!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
+            if (!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
                 throw new ArgumentException("Type must implement INotifyPropertyChanged.");
 
-            if(type.IsAbstract)
-                throw new ArgumentException("Type сannot be abstract.");
-
-            try
-            {
-                var ctor = GetOrCreateProxyTypeCtor(type);
-                return ctor();
-            }
-            catch(InvalidOperationException ex)
-            {
-                throw new InvalidOperationException(ex.Message, ex);
-            }
+            return GetOrCreateProxyTypeCtor(type);
         }
+
 
         static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
         {
+            if(type.IsAbstract || type.IsSealed)
+                throw new ArgumentException("Type сannot be abstract or sealed.");
+
             var guid = type.GUID;
 
             Func<INotifyPropertyChanged> ctor;
@@ -71,11 +65,12 @@ namespace IEVin.NotifyAutoImplementer.Core
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
-            var raiseMi = NotifyAutoImplementerHelper.GetRaise(type);
+            var raiseMi = PropertyChangedNotificatorHelper.GetRaise(type);
 
             foreach(var q in GetPropertyNames(type))
             {
-                var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
+                // MethodInfo.GetCustomAttributes has error (ignore 'inherit = true' for properties). Attribute.GetCustomAttributes is correct.
+                var attribs = Attribute.GetCustomAttributes(q, typeof(NotifyPropertyAttribute), inherit: true);
                 if(!attribs.Any())
                     continue;
 
@@ -107,11 +102,11 @@ namespace IEVin.NotifyAutoImplementer.Core
                                  .Select(x => (double?)x.Precision)
                                  .FirstOrDefault();
 
-                var equalsMi = NotifyAutoImplementerHelper.GetEquals(getter.ReturnType, ref precision);
+                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, ref precision);
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
-                         .Select(x => x.PropertyName ?? name)
-                         .Distinct();
+                                         .Select(x => x.PropertyName ?? name)
+                                         .Distinct();
 
                 var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi, precision);
                 tb.DefineMethodOverride(newSetter, setter);

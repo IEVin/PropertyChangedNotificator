@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IEVin.NotifyAutoImplementer.TestCore")]
+[assembly: AssemblyTitle("IEVin.PropertyChangedNotificator.TestCore")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("IEVin.NotifyAutoImplementer.TestCore")]
+[assembly: AssemblyProduct("IEVin.PropertyChangedNotificator.TestCore")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

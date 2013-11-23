@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using IEVin.NotifyAutoImplementer.Core;
-using IEVin.NotifyAutoImplementer.TestCore.TestModels;
+using IEVin.PropertyChangedNotificator.TestCore.TestModels;
 using NUnit.Framework;
 
-namespace IEVin.NotifyAutoImplementer.TestCore
+namespace IEVin.PropertyChangedNotificator.TestCore
 {
     [TestFixture]
     public class Tests
@@ -16,7 +15,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.NotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
 
             // modify
             model.NotifyProperty = 1;
@@ -44,7 +43,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.NotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotNotifyProperty, () => counter++);
 
             model.NotifyProperty = 1;
 
@@ -57,7 +56,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.VirtualNotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
 
@@ -84,7 +83,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithInvalideInvocator2>());
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithNotPublicInvocator>());
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithMultyInvocator>());
-            Assert.Throws(typeof(ArgumentException), () => Notificator.Of(typeof(ModelWithAbstractInvocator)));
+            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(ModelWithAbstractInvocator)));
 
             Assert.DoesNotThrow(() => Notificator.Of<ModelWithCorrectInvocator>());
         }
@@ -92,8 +91,8 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         [Test]
         public void FailedTypeTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => Notificator.Of(null));
-            Assert.Throws(typeof(ArgumentException), () => Notificator.Of(typeof(object)));
+            Assert.Throws(typeof(ArgumentNullException), () => Notificator.ConstructorOf(null));
+            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(object)));
         }
 
         [Test]
@@ -103,8 +102,8 @@ namespace IEVin.NotifyAutoImplementer.TestCore
 
             var doubleCounter = 0;
             var otherCounter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.MultyNotifyProperty, () => doubleCounter++);
-            SetChangedAction(model, (TestModelBase x) => x.OtherNotifyProperty, () => otherCounter++);
+            model.SetChangedAction(x => x.MultyNotifyProperty, () => doubleCounter++);
+            model.SetChangedAction(x => x.OtherNotifyProperty, () => otherCounter++);
 
             model.MultyNotifyProperty = 1;
 
@@ -118,7 +117,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.DoubleNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DoubleNotifyProperty, () => counter++);
 
             model.DoubleNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -137,7 +136,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.FloatNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.FloatNotifyProperty, () => counter++);
 
             model.FloatNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -155,21 +154,21 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         {
             var model = Notificator.Of<TestModel>();
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
             Assert.AreEqual(counter, 0);
         }
 
         [Test]
-        public void StringNotifyProperty()
+        public void StringNotifyPropertyTest()
         {
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
             var comboCounter = 0;
-            SetChangedAction(model, (TestModel x) => x.StringNotifyProperty, () => counter++);
-            SetChangedAction(model, (TestModel x) => x.ComboProperty, () => comboCounter++);
+            model.SetChangedAction(x => x.StringNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.ComboProperty, () => comboCounter++);
 
             model.StringNotifyProperty = "Test";
             Assert.AreEqual(counter, 1);
@@ -182,7 +181,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.DoublePrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DoublePrecisionNotifyProperty, () => counter++);
 
             model.DoublePrecisionNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -203,7 +202,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.FloatPrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.FloatPrecisionNotifyProperty, () => counter++);
 
             model.FloatPrecisionNotifyProperty = 1f;
             Assert.AreEqual(counter, 1);
@@ -224,7 +223,7 @@ namespace IEVin.NotifyAutoImplementer.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.DecimalPrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DecimalPrecisionNotifyProperty, () => counter++);
 
             model.DecimalPrecisionNotifyProperty = 2;
             Assert.AreEqual(counter, 1);
@@ -240,12 +239,58 @@ namespace IEVin.NotifyAutoImplementer.TestCore
         }
 
         [Test]
+        public void AbstructChildTest()
+        {
+            var model = Notificator.Of<ChildAbstructModel>();
+
+            var overrideCounter = 0;
+            var baseCounter = 0;
+            model.SetChangedAction(x => x.OverrideProperty, () => overrideCounter++);
+            model.SetChangedAction(x => x.BaseProperty, () => baseCounter++);
+
+            model.OverrideProperty = "OverrideProperty";
+            Assert.AreEqual(overrideCounter, 1);
+
+            model.BaseProperty = "BaseProperty";
+            Assert.AreEqual(baseCounter, 1);
+        }
+
+        [Test]
+        public void ConstructorOfTest()
+        {
+            var ctor = Notificator.ConstructorOf<TestModelBase>();
+
+            var model1 = ctor();
+            var model2 = ctor();
+
+            Assert.NotNull(model1);
+            Assert.NotNull(model2);
+
+            Assert.AreNotEqual(model1, model2);
+            Assert.AreEqual(model1.GetType(), model2.GetType());
+
+            var counter1 = 0;
+            var counter2 = 0;
+            model1.SetChangedAction(x => x.NotifyProperty, () => counter1++);
+            model2.SetChangedAction(x => x.NotifyProperty, () => counter2++);
+
+            model1.NotifyProperty = 1;
+            Assert.AreEqual(counter1, 1);
+            Assert.AreEqual(counter2, 0);
+
+            model2.NotifyProperty = 1;
+            model2.NotifyProperty = 2;
+            Assert.AreEqual(counter1, 1);
+            Assert.AreEqual(counter2, 2);
+        }
+
+        [Test]
         public void RefletionTest()
         {
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.NotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
 
             Assert.DoesNotThrow(() =>
                                     {
@@ -255,8 +300,12 @@ namespace IEVin.NotifyAutoImplementer.TestCore
 
             Assert.AreEqual(counter, 1);
         }
+    }
 
-        static void SetChangedAction<T, TValue>(INotifyPropertyChanged model, Expression<Func<T, TValue>> property, Action onChanged)
+    static class TestsExt
+    {
+        public static void SetChangedAction<T, TValue>(this T model, Expression<Func<T, TValue>> property, Action onChanged)
+            where T : INotifyPropertyChanged
         {
             var name = ((MemberExpression)property.Body).Member.Name;
 
