@@ -15,48 +15,38 @@ namespace IEVin.PropertyChangedNotificator
 
         static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
 
+
         public static T Of<T>()
             where T : INotifyPropertyChanged, new()
         {
-            var type = typeof(T);
-            if(type.IsAbstract || type.IsSealed)
-                throw new ArgumentException("Type сannot be abstract or sealed.");
-
-            try
-            {
-                var ctor = GetOrCreateProxyTypeCtor(type);
-                return (T)ctor();
-            }
-            catch(InvalidOperationException ex)
-            {
-                throw new InvalidOperationException(ex.Message, ex);
-            }
+            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+            return (T)ctor();
         }
 
-        public static object Of(Type type)
+        public static Func<T> ConstructorOf<T>()
+            where T : INotifyPropertyChanged, new()
         {
-            if(type == null)
+            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
+            return () => (T)ctor();
+        }
+
+        public static Func<INotifyPropertyChanged> ConstructorOf(Type type)
+        {
+            if (type == null)
                 throw new ArgumentNullException("type");
 
-            if(!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
+            if (!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
                 throw new ArgumentException("Type must implement INotifyPropertyChanged.");
 
-            if(type.IsAbstract || type.IsSealed)
-                throw new ArgumentException("Type сannot be abstract or sealed.");
-
-            try
-            {
-                var ctor = GetOrCreateProxyTypeCtor(type);
-                return ctor();
-            }
-            catch(InvalidOperationException ex)
-            {
-                throw new InvalidOperationException(ex.Message, ex);
-            }
+            return GetOrCreateProxyTypeCtor(type);
         }
+
 
         static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
         {
+            if(type.IsAbstract || type.IsSealed)
+                throw new ArgumentException("Type сannot be abstract or sealed.");
+
             var guid = type.GUID;
 
             Func<INotifyPropertyChanged> ctor;

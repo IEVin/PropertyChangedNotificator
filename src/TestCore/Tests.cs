@@ -83,7 +83,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithInvalideInvocator2>());
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithNotPublicInvocator>());
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithMultyInvocator>());
-            Assert.Throws(typeof(ArgumentException), () => Notificator.Of(typeof(ModelWithAbstractInvocator)));
+            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(ModelWithAbstractInvocator)));
 
             Assert.DoesNotThrow(() => Notificator.Of<ModelWithCorrectInvocator>());
         }
@@ -91,8 +91,8 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void FailedTypeTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => Notificator.Of(null));
-            Assert.Throws(typeof(ArgumentException), () => Notificator.Of(typeof(object)));
+            Assert.Throws(typeof(ArgumentNullException), () => Notificator.ConstructorOf(null));
+            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(object)));
         }
 
         [Test]
@@ -253,6 +253,35 @@ namespace IEVin.PropertyChangedNotificator.TestCore
 
             model.BaseProperty = "BaseProperty";
             Assert.AreEqual(baseCounter, 1);
+        }
+
+        [Test]
+        public void ConstructorOfTest()
+        {
+            var ctor = Notificator.ConstructorOf<TestModelBase>();
+
+            var model1 = ctor();
+            var model2 = ctor();
+
+            Assert.NotNull(model1);
+            Assert.NotNull(model2);
+
+            Assert.AreNotEqual(model1, model2);
+            Assert.AreEqual(model1.GetType(), model2.GetType());
+
+            var counter1 = 0;
+            var counter2 = 0;
+            model1.SetChangedAction(x => x.NotifyProperty, () => counter1++);
+            model2.SetChangedAction(x => x.NotifyProperty, () => counter2++);
+
+            model1.NotifyProperty = 1;
+            Assert.AreEqual(counter1, 1);
+            Assert.AreEqual(counter2, 0);
+
+            model2.NotifyProperty = 1;
+            model2.NotifyProperty = 2;
+            Assert.AreEqual(counter1, 1);
+            Assert.AreEqual(counter2, 2);
         }
 
         [Test]
