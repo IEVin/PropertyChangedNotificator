@@ -51,9 +51,19 @@ namespace IEVin.PropertyChangedNotificator.Helper
 
         internal static MethodInfo GetRaise(Type type)
         {
-            var mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                         .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
-                         .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
+            MethodInfo mi;
+
+            try
+            {
+                mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                              .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
+                              .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
+            }
+            catch(Exception ex)
+            {
+                var msg = string.Format("Type '{0}' contains no single method marked NotificationInvocatorAttribute.", type.FullName);
+                throw new InvalidOperationException(msg, ex);
+            }
 
             var prms = mi.GetParameters();
 
