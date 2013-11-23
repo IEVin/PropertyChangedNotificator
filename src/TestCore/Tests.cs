@@ -15,7 +15,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.NotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
 
             // modify
             model.NotifyProperty = 1;
@@ -43,7 +43,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.NotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotNotifyProperty, () => counter++);
 
             model.NotifyProperty = 1;
 
@@ -56,7 +56,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.VirtualNotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
 
@@ -102,8 +102,8 @@ namespace IEVin.PropertyChangedNotificator.TestCore
 
             var doubleCounter = 0;
             var otherCounter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.MultyNotifyProperty, () => doubleCounter++);
-            SetChangedAction(model, (TestModelBase x) => x.OtherNotifyProperty, () => otherCounter++);
+            model.SetChangedAction(x => x.MultyNotifyProperty, () => doubleCounter++);
+            model.SetChangedAction(x => x.OtherNotifyProperty, () => otherCounter++);
 
             model.MultyNotifyProperty = 1;
 
@@ -117,7 +117,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.DoubleNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DoubleNotifyProperty, () => counter++);
 
             model.DoubleNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -136,7 +136,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModelBase x) => x.FloatNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.FloatNotifyProperty, () => counter++);
 
             model.FloatNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -154,21 +154,21 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         {
             var model = Notificator.Of<TestModel>();
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.VirtualNotNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
 
             model.VirtualNotNotifyProperty = 1;
             Assert.AreEqual(counter, 0);
         }
 
         [Test]
-        public void StringNotifyProperty()
+        public void StringNotifyPropertyTest()
         {
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
             var comboCounter = 0;
-            SetChangedAction(model, (TestModel x) => x.StringNotifyProperty, () => counter++);
-            SetChangedAction(model, (TestModel x) => x.ComboProperty, () => comboCounter++);
+            model.SetChangedAction(x => x.StringNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.ComboProperty, () => comboCounter++);
 
             model.StringNotifyProperty = "Test";
             Assert.AreEqual(counter, 1);
@@ -181,7 +181,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.DoublePrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DoublePrecisionNotifyProperty, () => counter++);
 
             model.DoublePrecisionNotifyProperty = 1;
             Assert.AreEqual(counter, 1);
@@ -202,7 +202,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.FloatPrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.FloatPrecisionNotifyProperty, () => counter++);
 
             model.FloatPrecisionNotifyProperty = 1f;
             Assert.AreEqual(counter, 1);
@@ -223,7 +223,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModel>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.DecimalPrecisionNotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.DecimalPrecisionNotifyProperty, () => counter++);
 
             model.DecimalPrecisionNotifyProperty = 2;
             Assert.AreEqual(counter, 1);
@@ -244,7 +244,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             var model = Notificator.Of<TestModelBase>();
 
             var counter = 0;
-            SetChangedAction(model, (TestModel x) => x.NotifyProperty, () => counter++);
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
 
             Assert.DoesNotThrow(() =>
                                     {
@@ -254,8 +254,12 @@ namespace IEVin.PropertyChangedNotificator.TestCore
 
             Assert.AreEqual(counter, 1);
         }
+    }
 
-        static void SetChangedAction<T, TValue>(INotifyPropertyChanged model, Expression<Func<T, TValue>> property, Action onChanged)
+    static class TestsExt
+    {
+        public static void SetChangedAction<T, TValue>(this T model, Expression<Func<T, TValue>> property, Action onChanged)
+            where T : INotifyPropertyChanged
         {
             var name = ((MemberExpression)property.Body).Member.Name;
 
