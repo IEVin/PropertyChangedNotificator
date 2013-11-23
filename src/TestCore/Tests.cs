@@ -239,6 +239,23 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         }
 
         [Test]
+        public void AbstructChildTest()
+        {
+            var model = Notificator.Of<ChildAbstructModel>();
+
+            var overrideCounter = 0;
+            var baseCounter = 0;
+            model.SetChangedAction(x => x.OverrideProperty, () => overrideCounter++);
+            model.SetChangedAction(x => x.BaseProperty, () => baseCounter++);
+
+            model.OverrideProperty = "OverrideProperty";
+            Assert.AreEqual(overrideCounter, 1);
+
+            model.BaseProperty = "BaseProperty";
+            Assert.AreEqual(baseCounter, 1);
+        }
+
+        [Test]
         public void RefletionTest()
         {
             var model = Notificator.Of<TestModelBase>();

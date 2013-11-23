@@ -79,7 +79,8 @@ namespace IEVin.PropertyChangedNotificator
 
             foreach(var q in GetPropertyNames(type))
             {
-                var attribs = q.GetCustomAttributes(typeof(NotifyPropertyAttribute), true);
+                // MethodInfo.GetCustomAttributes has error (ignore 'inherit = true' for properties). Attribute.GetCustomAttributes is correct.
+                var attribs = Attribute.GetCustomAttributes(q, typeof(NotifyPropertyAttribute), inherit: true);
                 if(!attribs.Any())
                     continue;
 

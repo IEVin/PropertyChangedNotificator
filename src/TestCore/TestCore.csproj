@@ -49,6 +49,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestModels\AbstractModel.cs" />
     <Compile Include="TestModels\FailedTestModels.cs" />
     <Compile Include="TestModels\ModelWithCorrectInvocator.cs" />
     <Compile Include="TestModels\NotPublicModel.cs" />
