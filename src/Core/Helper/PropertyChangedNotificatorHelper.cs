@@ -42,7 +42,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
             if(type == typeof(String))
                 return GetMethodInfo<String>(String.Equals);
 
-            var method = type.IsClass ? "EqualsRef" : "EqualsVal";
+            var method = type.IsClass || type.IsInterface ? "EqualsRef" : "EqualsVal";
 
             return typeof(PropertyChangedNotificatorHelper)
                 .GetMethod(method, BindingFlags.Static | BindingFlags.Public)

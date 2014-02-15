@@ -72,6 +72,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<PrivateGetModel>());
             Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<PrivateSetModel>());
 
+            Assert.DoesNotThrow(() => Notificator.Of<ModelWithInterfaceProperty>());
             Assert.DoesNotThrow(() => Notificator.Of<NotPublicModel>());
         }
 
