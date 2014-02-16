@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Linq;
 using System.Reflection.Emit;
@@ -41,7 +42,7 @@ namespace IEVin.PropertyChangedNotificator
             return GetOrCreateProxyTypeCtor(type);
         }
 
-
+        [DebuggerHidden]
         static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
         {
             if(type.IsAbstract || type.IsSealed)
@@ -60,6 +61,7 @@ namespace IEVin.PropertyChangedNotificator
                                               });
         }
 
+        [DebuggerHidden]
         static Type CreateProxyType(Type type)
         {
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
@@ -115,6 +117,7 @@ namespace IEVin.PropertyChangedNotificator
             return tb.CreateType();
         }
 
+        [DebuggerHidden]
         static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi,
                                              IEnumerable<string> names, MethodInfo raise, MethodInfo equals, double? eps)
         {
@@ -160,6 +163,7 @@ namespace IEVin.PropertyChangedNotificator
             return mb;
         }
 
+        [DebuggerHidden]
         static Func<INotifyPropertyChanged> CreateConstructior(Type type)
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
@@ -175,6 +179,7 @@ namespace IEVin.PropertyChangedNotificator
             return (Func<INotifyPropertyChanged>)dm.CreateDelegate(typeof(Func<INotifyPropertyChanged>));
         }
 
+        [DebuggerHidden]
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {
             return type != null
@@ -182,6 +187,7 @@ namespace IEVin.PropertyChangedNotificator
                        : Enumerable.Empty<PropertyInfo>();
         }
 
+        [DebuggerHidden]
         static ModuleBuilder CreateModule()
         {
             var assemblyName = new AssemblyName(string.Format("NAImplementerAssembly_{0}", Guid.NewGuid().ToString()));

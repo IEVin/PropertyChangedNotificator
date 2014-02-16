@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -74,21 +75,25 @@ namespace IEVin.PropertyChangedNotificator.Helper
             return mi;
         }
 
+        [DebuggerHidden]
         public static bool EqualsDouble(Double a, Double b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
+        [DebuggerHidden]
         public static bool EqualsSingle(Single a, Single b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
+        [DebuggerHidden]
         public static bool EqualsDecimal(Decimal a, Decimal b, double eps)
         {
             return Math.Abs(a - b) < (Decimal)eps;
         }
 
+        [DebuggerHidden]
         public static bool EqualsRef<T>(T a, T b)
             where T : class
         {
@@ -97,6 +102,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
                        : b == null;
         }
 
+        [DebuggerHidden]
         public static bool EqualsVal<T>(T a, T b)
             where T : struct
         {
