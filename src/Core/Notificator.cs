@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using IEVin.PropertyChangedNotificator.Helper;
 
@@ -13,52 +13,36 @@ namespace IEVin.PropertyChangedNotificator
     public static class Notificator
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
+        static readonly ConcurrentDictionary<Type, Type> s_cache = new ConcurrentDictionary<Type, Type>();
 
-        static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
-
-
-        public static T Of<T>()
-            where T : INotifyPropertyChanged, new()
+        public static void Create(INotifyPropertyChanged obj)
         {
-            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
-            return (T)ctor();
+            var type = GetTypeAndCheck(obj);
+            var proxyType = s_cache.GetOrAdd(type, CreateProxyType);
+
+            SetType(obj, proxyType);
         }
 
-        public static Func<T> ConstructorOf<T>()
-            where T : INotifyPropertyChanged, new()
+        static Type GetTypeAndCheck(object obj)
         {
-            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
-            return () => (T)ctor();
-        }
+            if(obj == null)
+                throw new ArgumentNullException("obj");
 
-        public static Func<INotifyPropertyChanged> ConstructorOf(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
+            var type = obj.GetType();
 
-            if (!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
-                throw new ArgumentException("Type must implement INotifyPropertyChanged.");
-
-            return GetOrCreateProxyTypeCtor(type);
-        }
-
-        [DebuggerHidden]
-        static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
-        {
             if(type.IsAbstract || type.IsSealed)
                 throw new ArgumentException("Type сannot be abstract or sealed.");
 
-            var guid = type.GUID;
+            return type;
+        }
 
-            Func<INotifyPropertyChanged> ctor;
-            if(s_cache.TryGetValue(guid, out ctor))
-                return ctor;
-
-            return s_cache.GetOrAdd(guid, x =>
-                                              {
-                                                  var proxyType = CreateProxyType(type);
-                                                  return CreateConstructior(proxyType);
-                                              });
+        static void SetType(object obj, Type proxyType)
+        {
+            unsafe
+            {
+                var conv = new ObjectToStructConv { From = new ObjWrap { Value = obj } };
+                conv.To.Value->MethodTable = proxyType.TypeHandle.Value;
+            }
         }
 
         [DebuggerHidden]

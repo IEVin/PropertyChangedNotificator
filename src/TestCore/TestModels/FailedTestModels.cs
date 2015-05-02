@@ -35,6 +35,11 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
     public class ModelWithoutInvocator : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public ModelWithoutInvocator()
+        {
+            Notificator.Create(this);
+        }
     }
 
     public class ModelWithInvalideInvocator : INotifyPropertyChanged
@@ -44,6 +49,11 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
         [NotificationInvocator]
         public void RaisePropertyChanged()
         {
+        }
+
+        public ModelWithInvalideInvocator()
+        {
+            Notificator.Create(this);
         }
     }
 
@@ -56,6 +66,11 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
         {
             return null;
         }
+
+        public ModelWithInvalideInvocator2()
+        {
+            Notificator.Create(this);
+        }
     }
 
     public class ModelWithNotPublicInvocator : INotifyPropertyChanged
@@ -65,6 +80,11 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
         [NotificationInvocator]
         internal void RaisePropertyChanged(string str)
         {
+        }
+
+        public ModelWithNotPublicInvocator()
+        {
+            Notificator.Create(this);
         }
     }
 
@@ -81,15 +101,10 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
         public void OnPropertyChanged(string str)
         {
         }
-    }
 
-    public abstract class ModelWithAbstractInvocator : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotificationInvocator]
-        protected void OnPropertyChanged(string propertyName)
+        public ModelWithMultyInvocator()
         {
+            Notificator.Create(this);
         }
     }
 }
