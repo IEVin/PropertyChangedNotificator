@@ -27,6 +27,8 @@ namespace IEVin.PropertyChangedNotificator.Helper
 
     unsafe class InfoWrap
     {
+#pragma warning disable 0649
         public ObjectTypeStruct* Value;
+#pragma warning restore 0649
     }
 }

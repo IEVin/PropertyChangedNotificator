@@ -19,29 +19,29 @@ namespace IEVin.PropertyChangedNotificator.Helper
 
         internal static MethodInfo GetEquals(Type type, ref double? precision)
         {
-            if(type == typeof(Double))
+            if(type == typeof(double))
             {
                 precision = precision ?? 1E-15;
-                return GetMethodInfo<Double>(EqualsDouble);
+                return GetMethodInfo<double>(EqualsDouble);
             }
 
-            if(type == typeof(Single))
+            if(type == typeof(float))
             {
                 precision = precision ?? 1E-7;
-                return GetMethodInfo<Single>(EqualsSingle);
+                return GetMethodInfo<float>(EqualsSingle);
             }
 
-            if(type == typeof(Decimal))
+            if(type == typeof(decimal))
             {
                 precision = precision ?? 1E-28;
-                return GetMethodInfo<Decimal>(EqualsDecimal);
+                return GetMethodInfo<decimal>(EqualsDecimal);
             }
 
             // precision only for double, float and decimal
             precision = null;
 
-            if(type == typeof(String))
-                return GetMethodInfo<String>(String.Equals);
+            if(type == typeof(string))
+                return GetMethodInfo<string>(string.Equals);
 
             var method = type.IsClass || type.IsInterface ? "EqualsRef" : "EqualsVal";
 
@@ -57,8 +57,8 @@ namespace IEVin.PropertyChangedNotificator.Helper
             try
             {
                 mi = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                              .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
-                              .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
+                         .Where(x => x.IsPublic | x.IsFamily | x.IsFamilyOrAssembly)
+                         .Single(x => x.GetCustomAttributes(typeof(NotificationInvocatorAttribute), true).Any());
             }
             catch(Exception ex)
             {
@@ -76,21 +76,21 @@ namespace IEVin.PropertyChangedNotificator.Helper
         }
 
         [DebuggerStepThrough]
-        public static bool EqualsDouble(Double a, Double b, double eps)
+        public static bool EqualsDouble(double a, double b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
         [DebuggerStepThrough]
-        public static bool EqualsSingle(Single a, Single b, double eps)
+        public static bool EqualsSingle(float a, float b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
         [DebuggerStepThrough]
-        public static bool EqualsDecimal(Decimal a, Decimal b, double eps)
+        public static bool EqualsDecimal(decimal a, decimal b, double eps)
         {
-            return Math.Abs(a - b) < (Decimal)eps;
+            return Math.Abs(a - b) < (decimal)eps;
         }
 
         [DebuggerStepThrough]

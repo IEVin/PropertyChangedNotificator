@@ -149,21 +149,6 @@ namespace IEVin.PropertyChangedNotificator
             return mb;
         }
 
-        static Func<INotifyPropertyChanged> CreateConstructior(Type type)
-        {
-            var ctor = type.GetConstructor(Type.EmptyTypes);
-            if(ctor == null)
-                return () => (INotifyPropertyChanged)Activator.CreateInstance(type);
-
-            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(Notificator).Module);
-            var il = dm.GetILGenerator();
-
-            il.Emit(OpCodes.Newobj, ctor);
-            il.Emit(OpCodes.Ret);
-
-            return (Func<INotifyPropertyChanged>)dm.CreateDelegate(typeof(Func<INotifyPropertyChanged>));
-        }
-
         [DebuggerStepThrough]
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {

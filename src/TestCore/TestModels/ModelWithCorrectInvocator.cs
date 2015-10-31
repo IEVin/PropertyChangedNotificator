@@ -4,7 +4,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
 {
     public class ModelWithCorrectInvocator : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         [NotificationInvocator]
         protected void OnPropertyChanged(string prop)
