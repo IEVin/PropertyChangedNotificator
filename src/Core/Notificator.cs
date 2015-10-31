@@ -37,6 +37,7 @@ namespace IEVin.PropertyChangedNotificator
             return type;
         }
 
+        [DebuggerStepThrough]
         static void SetType(object obj, Type proxyType)
         {
             unsafe
@@ -46,7 +47,7 @@ namespace IEVin.PropertyChangedNotificator
             }
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         static Type CreateProxyType(Type type)
         {
             var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
@@ -102,7 +103,7 @@ namespace IEVin.PropertyChangedNotificator
             return tb.CreateType();
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi,
                                              IEnumerable<string> names, MethodInfo raise, MethodInfo equals, double? eps)
         {
@@ -148,7 +149,6 @@ namespace IEVin.PropertyChangedNotificator
             return mb;
         }
 
-        [DebuggerHidden]
         static Func<INotifyPropertyChanged> CreateConstructior(Type type)
         {
             var ctor = type.GetConstructor(Type.EmptyTypes);
@@ -164,7 +164,7 @@ namespace IEVin.PropertyChangedNotificator
             return (Func<INotifyPropertyChanged>)dm.CreateDelegate(typeof(Func<INotifyPropertyChanged>));
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {
             return type != null
@@ -172,7 +172,7 @@ namespace IEVin.PropertyChangedNotificator
                        : Enumerable.Empty<PropertyInfo>();
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         static ModuleBuilder CreateModule()
         {
             var assemblyName = new AssemblyName(string.Format("NAImplementerAssembly_{0}", Guid.NewGuid().ToString()));

@@ -75,25 +75,25 @@ namespace IEVin.PropertyChangedNotificator.Helper
             return mi;
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         public static bool EqualsDouble(Double a, Double b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         public static bool EqualsSingle(Single a, Single b, double eps)
         {
             return Math.Abs(a - b) < eps;
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         public static bool EqualsDecimal(Decimal a, Decimal b, double eps)
         {
             return Math.Abs(a - b) < (Decimal)eps;
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         public static bool EqualsRef<T>(T a, T b)
             where T : class
         {
@@ -102,7 +102,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
                        : b == null;
         }
 
-        [DebuggerHidden]
+        [DebuggerStepThrough]
         public static bool EqualsVal<T>(T a, T b)
             where T : struct
         {

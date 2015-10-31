@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace IEVin.PropertyChangedNotificator
@@ -9,6 +10,7 @@ namespace IEVin.PropertyChangedNotificator
         public event PropertyChangedEventHandler PropertyChanged;
 
 
+        [DebuggerStepThrough]
         [NotificationInvocator]
         protected void RaisePropertyChanged(string propertyName)
         {
@@ -17,6 +19,7 @@ namespace IEVin.PropertyChangedNotificator
                 handler(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        [DebuggerStepThrough]
         protected void RaisePropertyChanged<T>(Expression<Func<T>> expression)
         {
             var name = ((MemberExpression)expression.Body).Member.Name;
