@@ -6,5 +6,10 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
     {
         [NotifyProperty]
         public virtual IEnumerable<int> Test { get; set; }
+
+        public ModelWithInterfaceProperty()
+        {
+            Notificator.Create(this);
+        }
     }
 }

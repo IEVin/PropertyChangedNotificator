@@ -10,5 +10,10 @@ namespace IEVin.PropertyChangedNotificator.TestCore.TestModels
         protected void OnPropertyChanged(string prop)
         {
         }
+
+        public ModelWithCorrectInvocator()
+        {
+            Notificator.Create(this);
+        }
     }
 }

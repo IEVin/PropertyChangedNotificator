@@ -22,5 +22,10 @@
         {
             get { return string.Format("StringNotifyProperty={0};", StringNotifyProperty); }
         }
+
+        public TestModel()
+        {
+            Notificator.Create(this);
+        }
     }
 }

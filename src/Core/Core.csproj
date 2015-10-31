@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes.cs" />
+    <Compile Include="Helper\TypeCache.cs" />
     <Compile Include="Notificator.cs" />
     <Compile Include="Helper\PropertyChangedNotificatorHelper.cs" />
     <Compile Include="NotificationObject.cs" />

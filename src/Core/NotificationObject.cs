@@ -8,10 +8,6 @@ namespace IEVin.PropertyChangedNotificator
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected NotificationObject()
-        {
-            Notificator.Create(this);
-        }
 
         [NotificationInvocator]
         protected void RaisePropertyChanged(string propertyName)

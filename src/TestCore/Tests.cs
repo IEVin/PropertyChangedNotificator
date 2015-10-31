@@ -95,7 +95,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void FailedTypeTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => Notificator.Create(null));
+            Assert.Throws(typeof(ArgumentNullException), () => Notificator.Create<INotifyPropertyChanged>(null));
         }
 
         [Test]

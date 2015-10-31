@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,13 +12,15 @@ namespace IEVin.PropertyChangedNotificator
     public static class Notificator
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
-        static readonly ConcurrentDictionary<Type, Type> s_cache = new ConcurrentDictionary<Type, Type>();
 
-        public static void Create(INotifyPropertyChanged obj)
+        public static void Create<T>(T obj)
+            where T : INotifyPropertyChanged
         {
             var type = GetTypeAndCheck(obj);
-            var proxyType = s_cache.GetOrAdd(type, CreateProxyType);
+            if (type != typeof(T))
+                return;
 
+            var proxyType = TypeCache<T>.GetOrCreate(CreateProxyType);
             SetType(obj, proxyType);
         }
 
