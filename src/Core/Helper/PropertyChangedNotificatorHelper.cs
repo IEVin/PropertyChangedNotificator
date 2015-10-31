@@ -7,47 +7,46 @@ namespace IEVin.PropertyChangedNotificator.Helper
 {
     public static class PropertyChangedNotificatorHelper
     {
-        static MethodInfo GetMethodInfo<T>(Func<T, T, bool> func)
+        internal static MethodInfo GetEquals(Type type, out double? precision)
         {
-            return func.Method;
-        }
-
-        static MethodInfo GetMethodInfo<T>(Func<T, T, double, bool> func)
-        {
-            return func.Method;
-        }
-
-        internal static MethodInfo GetEquals(Type type, ref double? precision)
-        {
-            if(type == typeof(double))
-            {
-                precision = precision ?? 1E-15;
-                return GetMethodInfo<double>(EqualsDouble);
-            }
-
-            if(type == typeof(float))
-            {
-                precision = precision ?? 1E-7;
-                return GetMethodInfo<float>(EqualsSingle);
-            }
-
-            if(type == typeof(decimal))
-            {
-                precision = precision ?? 1E-28;
-                return GetMethodInfo<decimal>(EqualsDecimal);
-            }
-
             // precision only for double, float and decimal
             precision = null;
+            string methodName;
 
-            if(type == typeof(string))
-                return GetMethodInfo<string>(string.Equals);
+            if(type == typeof(double))
+            {
+                precision = 1E-15;
+                methodName = nameof(EqualsDouble);
+            }
+            else if(type == typeof(float))
+            {
+                precision = 1E-7;
+                methodName = nameof(EqualsSingle);
+            }
+            else if(type == typeof(decimal))
+            {
+                precision = 1E-28;
+                methodName = nameof(EqualsDecimal);
+            }
+            else if(type.IsClass || type.IsInterface)
+            {
+                methodName = nameof(EqualsRef);
+            }
+            else if(typeof(IEquatable<>).MakeGenericType(type).IsAssignableFrom(type))
+            {
+                methodName = nameof(EqualsValEquatable);
+            }
+            else
+            {
+                methodName = nameof(EqualsVal);
+            }
 
-            var method = type.IsClass || type.IsInterface ? "EqualsRef" : "EqualsVal";
+            var method = typeof(PropertyChangedNotificatorHelper).GetMethod(methodName, BindingFlags.Static | BindingFlags.Public);
 
-            return typeof(PropertyChangedNotificatorHelper)
-                .GetMethod(method, BindingFlags.Static | BindingFlags.Public)
-                .MakeGenericMethod(type);
+            if(precision == null)
+                method = method.MakeGenericMethod(type);
+
+            return method;
         }
 
         internal static MethodInfo GetRaise(Type type)
@@ -62,7 +61,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
             }
             catch(Exception ex)
             {
-                var msg = string.Format("Type '{0}' contains no single method marked NotificationInvocatorAttribute.", type.FullName);
+                var msg = $"Type '{type.FullName}' contains no single method marked NotificationInvocatorAttribute.";
                 throw new InvalidOperationException(msg, ex);
             }
 
@@ -97,19 +96,25 @@ namespace IEVin.PropertyChangedNotificator.Helper
         public static bool EqualsRef<T>(T a, T b)
             where T : class
         {
-            return a != null
-                       ? a.Equals(b)
-                       : b == null;
+            if(a == b)
+                return true;
+            if(a == null || b == null)
+                return false;
+            return a.Equals(b);
         }
 
         [DebuggerStepThrough]
         public static bool EqualsVal<T>(T a, T b)
             where T : struct
         {
-            var eq = a as IEquatable<T>;
-            return eq != null
-                       ? eq.Equals(b)
-                       : a.Equals(b);
+            return a.Equals(b);
+        }
+
+        [DebuggerStepThrough]
+        public static bool EqualsValEquatable<T>(T a, T b)
+            where T : struct, IEquatable<T>
+        {
+            return a.Equals(b);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace IEVin.PropertyChangedNotificator
             where T : INotifyPropertyChanged
         {
             var type = GetTypeAndCheck(obj);
-            if (type != typeof(T))
+            if(type != typeof(T))
                 return;
 
             var proxyType = TypeCache<T>.GetOrCreate(CreateProxyType);
@@ -27,7 +27,7 @@ namespace IEVin.PropertyChangedNotificator
         static Type GetTypeAndCheck(object obj)
         {
             if(obj == null)
-                throw new ArgumentNullException("obj");
+                throw new ArgumentNullException(nameof(obj));
 
             var type = obj.GetType();
 
@@ -68,33 +68,36 @@ namespace IEVin.PropertyChangedNotificator
 
                 if(getter == null || getter.IsPrivate || getter.IsAssembly)
                 {
-                    var msg = string.Format("Getter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    var msg = $"Getter property '{q.Name}' of type '{type.FullName}' must be public or protected.";
                     throw new InvalidOperationException(msg);
                 }
 
                 if(setter == null || setter.IsPrivate || setter.IsAssembly)
                 {
-                    var msg = string.Format("Setter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    var msg = $"Setter property '{q.Name}' of type '{type.FullName}' must be public or protected.";
                     throw new InvalidOperationException(msg);
                 }
 
                 if(!setter.IsVirtual)
                 {
-                    var msg = string.Format("Setter property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
+                    var msg = $"Setter property '{q.Name}' of type '{type.FullName}' must be virtual.";
                     throw new InvalidOperationException(msg);
                 }
 
 
-                var precision = q.GetCustomAttributes(typeof(SetPrecisionAttribute), true)
+                double? precision;
+                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, out precision);
+
+                if(precision != null)
+                {
+                    precision = q.GetCustomAttributes(typeof(SetPrecisionAttribute), true)
                                  .Cast<SetPrecisionAttribute>()
                                  .Select(x => (double?)x.Precision)
-                                 .FirstOrDefault();
-
-                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, ref precision);
+                                 .FirstOrDefault() ?? precision;
+                }
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
-                                         .Select(x => x.PropertyName ?? name)
-                                         .Distinct();
+                                         .Select(x => x.PropertyName ?? name);
 
                 var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi, precision);
                 tb.DefineMethodOverride(newSetter, setter);
@@ -152,15 +155,14 @@ namespace IEVin.PropertyChangedNotificator
         [DebuggerStepThrough]
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {
-            return type != null
-                       ? type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
-                       : Enumerable.Empty<PropertyInfo>();
+            return type?.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
+                   ?? Enumerable.Empty<PropertyInfo>();
         }
 
         [DebuggerStepThrough]
         static ModuleBuilder CreateModule()
         {
-            var assemblyName = new AssemblyName(string.Format("NAImplementerAssembly_{0}", Guid.NewGuid().ToString()));
+            var assemblyName = new AssemblyName($"NAImplementerAssembly_{Guid.NewGuid().ToString()}");
 
             return AppDomain.CurrentDomain
                             .DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run)
