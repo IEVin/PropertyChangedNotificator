@@ -2,7 +2,7 @@
 
 namespace IEVin.PropertyChangedNotificator.Helper
 {
-    public class TypeCache<T>
+    class TypeCache<T>
     {
         // ReSharper disable once StaticMemberInGenericType
         static Type s_type;
@@ -12,7 +12,7 @@ namespace IEVin.PropertyChangedNotificator.Helper
             if(s_type != null)
                 return s_type;
 
-            lock(typeof(TypeCache<T>).FullName)
+            lock(typeof(TypeCache<T>))
                 return s_type ?? (s_type = creator(typeof(T)));
         }
     }
