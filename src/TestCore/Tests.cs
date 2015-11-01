@@ -303,6 +303,31 @@ namespace IEVin.PropertyChangedNotificator.TestCore
 
             Assert.AreEqual(counter, 1);
         }
+
+        [Test]
+        public void MemoryLeaksTest()
+        {
+            var weak = CreateWeakRef();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.IsFalse(weak.IsAlive);
+        }
+
+        static WeakReference CreateWeakRef()
+        {
+            var model = new TestModelBase();
+
+            var counter = 0;
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
+
+            model.NotifyProperty = 1;
+            Assert.AreEqual(counter, 1);
+
+            return new WeakReference(model);
+        }
     }
 
     static class TestsExt
