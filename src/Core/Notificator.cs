@@ -50,7 +50,7 @@ namespace IEVin.PropertyChangedNotificator
         [DebuggerStepThrough]
         static Type CreateProxyType(Type type)
         {
-            var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
+            var tb = s_builder.Value.DefineType(type.FullName, type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
             var raiseMi = PropertyChangedNotificatorHelper.GetRaise(type);
