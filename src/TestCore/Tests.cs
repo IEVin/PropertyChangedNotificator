@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using IEVin.PropertyChangedNotificator.TestCore.TestModels;
 using NUnit.Framework;
@@ -314,6 +315,19 @@ namespace IEVin.PropertyChangedNotificator.TestCore
             GC.Collect();
 
             Assert.IsFalse(weak.IsAlive);
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "IsExpressionAlwaysTrue")]
+        [SuppressMessage("ReSharper", "RedundantCast")]
+        [SuppressMessage("ReSharper", "TryCastAlwaysSucceeds")]
+        public void CastingTest()
+        {
+            var model = new TestModelBase();
+
+            Assert.IsTrue(model is TestModelBase);
+            Assert.AreNotEqual(model as TestModelBase, null);
+            Assert.AreNotEqual((TestModelBase)model, null);
         }
 
         static WeakReference CreateWeakRef()
