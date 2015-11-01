@@ -21,5 +21,10 @@
 
         [NotifyProperty]
         public virtual float FloatNotifyProperty { get; set; }
+
+        public TestModelBase()
+        {
+            Notificator.Create(this);
+        }
     }
 }

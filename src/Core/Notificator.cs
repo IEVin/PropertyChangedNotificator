@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using IEVin.PropertyChangedNotificator.Helper;
 
@@ -13,56 +13,44 @@ namespace IEVin.PropertyChangedNotificator
     {
         static readonly Lazy<ModuleBuilder> s_builder = new Lazy<ModuleBuilder>(CreateModule);
 
-        static readonly ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>> s_cache = new ConcurrentDictionary<Guid, Func<INotifyPropertyChanged>>();
-
-
-        public static T Of<T>()
-            where T : INotifyPropertyChanged, new()
+        public static void Create<T>(T obj)
+            where T : INotifyPropertyChanged
         {
-            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
-            return (T)ctor();
+            var type = GetTypeAndCheck(obj);
+            if(type != typeof(T))
+                return;
+
+            var proxyType = TypeCache<T>.GetOrCreate(CreateProxyType);
+            SetType(obj, proxyType);
         }
 
-        public static Func<T> ConstructorOf<T>()
-            where T : INotifyPropertyChanged, new()
+        static Type GetTypeAndCheck(object obj)
         {
-            var ctor = GetOrCreateProxyTypeCtor(typeof(T));
-            return () => (T)ctor();
-        }
+            if(obj == null)
+                throw new ArgumentNullException(nameof(obj));
 
-        public static Func<INotifyPropertyChanged> ConstructorOf(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
+            var type = obj.GetType();
 
-            if (!typeof(INotifyPropertyChanged).IsAssignableFrom(type))
-                throw new ArgumentException("Type must implement INotifyPropertyChanged.");
-
-            return GetOrCreateProxyTypeCtor(type);
-        }
-
-
-        static Func<INotifyPropertyChanged> GetOrCreateProxyTypeCtor(Type type)
-        {
             if(type.IsAbstract || type.IsSealed)
                 throw new ArgumentException("Type сannot be abstract or sealed.");
 
-            var guid = type.GUID;
-
-            Func<INotifyPropertyChanged> ctor;
-            if(s_cache.TryGetValue(guid, out ctor))
-                return ctor;
-
-            return s_cache.GetOrAdd(guid, x =>
-                                              {
-                                                  var proxyType = CreateProxyType(type);
-                                                  return CreateConstructior(proxyType);
-                                              });
+            return type;
         }
 
+        [DebuggerStepThrough]
+        static void SetType(object obj, Type proxyType)
+        {
+            unsafe
+            {
+                var conv = new ObjectToStructConv { From = new ObjWrap { Value = obj } };
+                conv.To.Value->MethodTable = proxyType.TypeHandle.Value;
+            }
+        }
+
+        [DebuggerStepThrough]
         static Type CreateProxyType(Type type)
         {
-            var tb = s_builder.Value.DefineType(type.FullName + "_NotifyImplementation", type.Attributes, type);
+            var tb = s_builder.Value.DefineType(type.FullName, type.Attributes, type);
             tb.AddInterfaceImplementation(typeof(INotifyPropertyChanged));
 
             var raiseMi = PropertyChangedNotificatorHelper.GetRaise(type);
@@ -80,33 +68,36 @@ namespace IEVin.PropertyChangedNotificator
 
                 if(getter == null || getter.IsPrivate || getter.IsAssembly)
                 {
-                    var msg = string.Format("Getter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    var msg = $"Getter property '{q.Name}' of type '{type.FullName}' must be public or protected.";
                     throw new InvalidOperationException(msg);
                 }
 
                 if(setter == null || setter.IsPrivate || setter.IsAssembly)
                 {
-                    var msg = string.Format("Setter property '{0}' of type '{1}' must be public or protected.", q.Name, type.FullName);
+                    var msg = $"Setter property '{q.Name}' of type '{type.FullName}' must be public or protected.";
                     throw new InvalidOperationException(msg);
                 }
 
                 if(!setter.IsVirtual)
                 {
-                    var msg = string.Format("Setter property '{0}' of type '{1}' must be virtual.", q.Name, type.FullName);
+                    var msg = $"Setter property '{q.Name}' of type '{type.FullName}' must be virtual.";
                     throw new InvalidOperationException(msg);
                 }
 
 
-                var precision = q.GetCustomAttributes(typeof(SetPrecisionAttribute), true)
+                double? precision;
+                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, out precision);
+
+                if(precision != null)
+                {
+                    precision = q.GetCustomAttributes(typeof(SetPrecisionAttribute), true)
                                  .Cast<SetPrecisionAttribute>()
                                  .Select(x => (double?)x.Precision)
-                                 .FirstOrDefault();
-
-                var equalsMi = PropertyChangedNotificatorHelper.GetEquals(getter.ReturnType, ref precision);
+                                 .FirstOrDefault() ?? precision;
+                }
 
                 var notifyNames = attribs.Cast<NotifyPropertyAttribute>()
-                                         .Select(x => x.PropertyName ?? name)
-                                         .Distinct();
+                                         .Select(x => x.PropertyName ?? name);
 
                 var newSetter = CreateSetMethod(tb, getter, setter, notifyNames, raiseMi, equalsMi, precision);
                 tb.DefineMethodOverride(newSetter, setter);
@@ -115,6 +106,7 @@ namespace IEVin.PropertyChangedNotificator
             return tb.CreateType();
         }
 
+        [DebuggerStepThrough]
         static MethodBuilder CreateSetMethod(TypeBuilder tb, MethodInfo getMi, MethodInfo setMi,
                                              IEnumerable<string> names, MethodInfo raise, MethodInfo equals, double? eps)
         {
@@ -160,31 +152,17 @@ namespace IEVin.PropertyChangedNotificator
             return mb;
         }
 
-        static Func<INotifyPropertyChanged> CreateConstructior(Type type)
-        {
-            var ctor = type.GetConstructor(Type.EmptyTypes);
-            if(ctor == null)
-                return () => (INotifyPropertyChanged)Activator.CreateInstance(type);
-
-            var dm = new DynamicMethod(type.FullName + "_ctor", type, Type.EmptyTypes, typeof(Notificator).Module);
-            var il = dm.GetILGenerator();
-
-            il.Emit(OpCodes.Newobj, ctor);
-            il.Emit(OpCodes.Ret);
-
-            return (Func<INotifyPropertyChanged>)dm.CreateDelegate(typeof(Func<INotifyPropertyChanged>));
-        }
-
+        [DebuggerStepThrough]
         static IEnumerable<PropertyInfo> GetPropertyNames(Type type)
         {
-            return type != null
-                       ? type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
-                       : Enumerable.Empty<PropertyInfo>();
+            return type?.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty)
+                   ?? Enumerable.Empty<PropertyInfo>();
         }
 
+        [DebuggerStepThrough]
         static ModuleBuilder CreateModule()
         {
-            var assemblyName = new AssemblyName(string.Format("NAImplementerAssembly_{0}", Guid.NewGuid().ToString()));
+            var assemblyName = new AssemblyName($"NAImplementerAssembly_{Guid.NewGuid().ToString()}");
 
             return AppDomain.CurrentDomain
                             .DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using IEVin.PropertyChangedNotificator.TestCore.TestModels;
 using NUnit.Framework;
@@ -12,7 +13,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void SimpleNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.NotifyProperty, () => counter++);
@@ -40,7 +41,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void NotNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.NotNotifyProperty, () => counter++);
@@ -53,7 +54,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void VirtualNotNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
@@ -66,39 +67,42 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void FailedModelTest()
         {
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<NotVirtualModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<InternalGetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<InternalSetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<PrivateGetModel>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<PrivateSetModel>());
+            // ReSharper disable ObjectCreationAsStatement
+            Assert.Throws(typeof(InvalidOperationException), () => new NotVirtualModel());
+            Assert.Throws(typeof(InvalidOperationException), () => new InternalGetModel());
+            Assert.Throws(typeof(InvalidOperationException), () => new InternalSetModel());
+            Assert.Throws(typeof(InvalidOperationException), () => new PrivateGetModel());
+            Assert.Throws(typeof(InvalidOperationException), () => new PrivateSetModel());
 
-            Assert.DoesNotThrow(() => Notificator.Of<NotPublicModel>());
+            Assert.DoesNotThrow(() => new ModelWithInterfaceProperty());
+            Assert.DoesNotThrow(() => new NotPublicModel());
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         [Test]
         public void FailedInvocatorTest()
         {
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithoutInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithInvalideInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithInvalideInvocator2>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithNotPublicInvocator>());
-            Assert.Throws(typeof(InvalidOperationException), () => Notificator.Of<ModelWithMultyInvocator>());
-            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(ModelWithAbstractInvocator)));
+            // ReSharper disable ObjectCreationAsStatement
+            Assert.Throws(typeof(InvalidOperationException), () => new ModelWithoutInvocator());
+            Assert.Throws(typeof(InvalidOperationException), () => new ModelWithInvalideInvocator());
+            Assert.Throws(typeof(InvalidOperationException), () => new ModelWithInvalideInvocator2());
+            Assert.Throws(typeof(InvalidOperationException), () => new ModelWithNotPublicInvocator());
+            Assert.Throws(typeof(InvalidOperationException), () => new ModelWithMultyInvocator());
 
-            Assert.DoesNotThrow(() => Notificator.Of<ModelWithCorrectInvocator>());
+            Assert.DoesNotThrow(() => new ModelWithCorrectInvocator());
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         [Test]
         public void FailedTypeTest()
         {
-            Assert.Throws(typeof(ArgumentNullException), () => Notificator.ConstructorOf(null));
-            Assert.Throws(typeof(ArgumentException), () => Notificator.ConstructorOf(typeof(object)));
+            Assert.Throws(typeof(ArgumentNullException), () => Notificator.Create<INotifyPropertyChanged>(null));
         }
 
         [Test]
         public void MultyNoifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var doubleCounter = 0;
             var otherCounter = 0;
@@ -114,7 +118,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void DefaultPrecisionDoubleNoifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.DoubleNotifyProperty, () => counter++);
@@ -133,7 +137,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void DefaultPrecisionFloatNoifyPropertyTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.FloatNotifyProperty, () => counter++);
@@ -152,7 +156,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void VirtualNotNotifyPropertyInDerivedClassTest()
         {
-            var model = Notificator.Of<TestModel>();
+            var model = new TestModel();
             var counter = 0;
             model.SetChangedAction(x => x.VirtualNotNotifyProperty, () => counter++);
 
@@ -163,7 +167,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void StringNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModel>();
+            var model = new TestModel();
 
             var counter = 0;
             var comboCounter = 0;
@@ -178,7 +182,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void PrecisionDoubleNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModel>();
+            var model = new TestModel();
 
             var counter = 0;
             model.SetChangedAction(x => x.DoublePrecisionNotifyProperty, () => counter++);
@@ -199,7 +203,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void PrecisionFloatNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModel>();
+            var model = new TestModel();
 
             var counter = 0;
             model.SetChangedAction(x => x.FloatPrecisionNotifyProperty, () => counter++);
@@ -220,7 +224,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void PrecisionDecimalNotifyPropertyTest()
         {
-            var model = Notificator.Of<TestModel>();
+            var model = new TestModel();
 
             var counter = 0;
             model.SetChangedAction(x => x.DecimalPrecisionNotifyProperty, () => counter++);
@@ -241,7 +245,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void AbstructChildTest()
         {
-            var model = Notificator.Of<ChildAbstructModel>();
+            var model = new ChildAbstructModel();
 
             var overrideCounter = 0;
             var baseCounter = 0;
@@ -258,7 +262,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void ConstructorOfTest()
         {
-            var ctor = Notificator.ConstructorOf<TestModelBase>();
+            Func<TestModelBase> ctor = () => new TestModelBase();
 
             var model1 = ctor();
             var model2 = ctor();
@@ -287,7 +291,7 @@ namespace IEVin.PropertyChangedNotificator.TestCore
         [Test]
         public void RefletionTest()
         {
-            var model = Notificator.Of<TestModelBase>();
+            var model = new TestModelBase();
 
             var counter = 0;
             model.SetChangedAction(x => x.NotifyProperty, () => counter++);
@@ -299,6 +303,44 @@ namespace IEVin.PropertyChangedNotificator.TestCore
                                     });
 
             Assert.AreEqual(counter, 1);
+        }
+
+        [Test]
+        public void MemoryLeaksTest()
+        {
+            var weak = CreateWeakRef();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            Assert.IsFalse(weak.IsAlive);
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "IsExpressionAlwaysTrue")]
+        [SuppressMessage("ReSharper", "RedundantCast")]
+        [SuppressMessage("ReSharper", "TryCastAlwaysSucceeds")]
+        public void CastingTest()
+        {
+            var model = new TestModelBase();
+
+            Assert.IsTrue(model is TestModelBase);
+            Assert.AreNotEqual(model as TestModelBase, null);
+            Assert.AreNotEqual((TestModelBase)model, null);
+        }
+
+        static WeakReference CreateWeakRef()
+        {
+            var model = new TestModelBase();
+
+            var counter = 0;
+            model.SetChangedAction(x => x.NotifyProperty, () => counter++);
+
+            model.NotifyProperty = 1;
+            Assert.AreEqual(counter, 1);
+
+            return new WeakReference(model);
         }
     }
 

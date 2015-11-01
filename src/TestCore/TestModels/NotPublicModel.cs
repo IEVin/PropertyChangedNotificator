@@ -10,5 +10,10 @@
 
         [NotifyProperty]
         protected virtual int ProtectedNotifyProperty { get; set; }
+
+        public NotPublicModel()
+        {
+            Notificator.Create(this);
+        }
     }
 }

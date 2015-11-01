@@ -12,5 +12,10 @@
     public class ChildAbstructModel : AbstractModel
     {
         public override string OverrideProperty { get; set; }
+
+        public ChildAbstructModel()
+        {
+            Notificator.Create(this);
+        }
     }
 }
